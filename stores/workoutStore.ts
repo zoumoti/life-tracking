@@ -6,7 +6,7 @@ import type { Tables, InsertTables } from "../types/database";
 
 // --- Types ---
 
-type Program = Tables<"workout_programs"> & {
+export type Program = Tables<"workout_programs"> & {
   exercises: (Tables<"workout_program_exercises"> & { exercise: Tables<"exercises"> })[];
 };
 
@@ -22,7 +22,7 @@ type SessionExercise = {
   sets: SessionSet[];
 };
 
-type ActiveSession = {
+export type ActiveSession = {
   id: string;
   programId: string | null;
   name: string;
