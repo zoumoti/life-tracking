@@ -5,23 +5,26 @@ import { colors } from "../../lib/theme";
 type Props = {
   current: number;
   warning?: boolean;
+  isAvoid?: boolean;
 };
 
-export function StreakBadge({ current, warning }: Props) {
+export function StreakBadge({ current, warning, isAvoid }: Props) {
   if (current === 0) return null;
+
+  const badgeColor = warning ? colors.warning : isAvoid ? colors.success : colors.primaryLight;
 
   return (
     <View className="flex-row items-center gap-1">
       <Feather
-        name="zap"
+        name={isAvoid ? "shield" : "zap"}
         size={14}
-        color={warning ? colors.warning : colors.primaryLight}
+        color={badgeColor}
       />
       <Text
         className="text-xs font-bold"
-        style={{ color: warning ? colors.warning : colors.primaryLight }}
+        style={{ color: badgeColor }}
       >
-        {current}
+        {current}j
       </Text>
     </View>
   );

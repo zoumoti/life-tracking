@@ -44,6 +44,7 @@ export interface Database {
           description: string;
           icon: string;
           color: string;
+          habit_type: "positive" | "avoid";
           frequency_type: "daily" | "specific_days" | "x_per_week";
           frequency_value: number;
           frequency_days: number[] | null;
@@ -63,6 +64,7 @@ export interface Database {
           description?: string;
           icon?: string;
           color?: string;
+          habit_type?: "positive" | "avoid";
           frequency_type?: "daily" | "specific_days" | "x_per_week";
           frequency_value?: number;
           frequency_days?: number[] | null;
@@ -82,6 +84,7 @@ export interface Database {
           description?: string;
           icon?: string;
           color?: string;
+          habit_type?: "positive" | "avoid";
           frequency_type?: "daily" | "specific_days" | "x_per_week";
           frequency_value?: number;
           frequency_days?: number[] | null;
@@ -470,6 +473,7 @@ export interface Database {
       [_ in never]: never;
     };
     Enums: {
+      habit_type: "positive" | "avoid";
       frequency_type: "daily" | "specific_days" | "x_per_week";
       time_of_day: "morning" | "afternoon" | "evening" | "anytime";
       running_type: "easy" | "tempo" | "intervals" | "race";

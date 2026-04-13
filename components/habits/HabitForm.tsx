@@ -9,11 +9,13 @@ import type { Tables } from "../../types/database";
 import { DAY_LABELS } from "../../lib/dateUtils";
 
 type FrequencyType = "daily" | "specific_days" | "x_per_week";
+type HabitType = "positive" | "avoid";
 
-type HabitFormData = {
+export type HabitFormData = {
   name: string;
   icon: string;
   color: string;
+  habit_type: HabitType;
   frequency_type: FrequencyType;
   frequency_value: number;
   frequency_days: number[];
@@ -39,6 +41,7 @@ const HABIT_COLORS = [
 ];
 
 export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
+  const [habitType, setHabitType] = useState<HabitType>(initial?.habit_type ?? "positive");
   const [name, setName] = useState(initial?.name ?? "");
   const [icon, setIcon] = useState(initial?.icon ?? "star");
   const [color, setColor] = useState(initial?.color ?? "#6C5CE7");
@@ -65,6 +68,7 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
       name: name.trim(),
       icon,
       color,
+      habit_type: habitType,
       frequency_type: frequencyType,
       frequency_value: frequencyValue,
       frequency_days: frequencyDays,
@@ -74,12 +78,57 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
+      {/* Habit Type Toggle */}
+      <Text className="text-text-secondary text-sm mb-2">Type d'habitude</Text>
+      <View className="flex-row bg-surface rounded-button p-1 mb-4">
+        <Pressable
+          onPress={() => setHabitType("positive")}
+          className={`flex-1 flex-row items-center justify-center py-2 rounded-button gap-2 ${
+            habitType === "positive" ? "bg-primary" : ""
+          }`}
+        >
+          <Feather
+            name="check-circle"
+            size={16}
+            color={habitType === "positive" ? "#fff" : colors.textSecondary}
+          />
+          <Text
+            className={`text-sm font-semibold ${
+              habitType === "positive" ? "text-white" : "text-text-secondary"
+            }`}
+          >
+            Faire
+          </Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setHabitType("avoid")}
+          className={`flex-1 flex-row items-center justify-center py-2 rounded-button gap-2 ${
+            habitType === "avoid" ? "bg-primary" : ""
+          }`}
+        >
+          <Feather
+            name="shield"
+            size={16}
+            color={habitType === "avoid" ? "#fff" : colors.textSecondary}
+          />
+          <Text
+            className={`text-sm font-semibold ${
+              habitType === "avoid" ? "text-white" : "text-text-secondary"
+            }`}
+          >
+            Eviter
+          </Text>
+        </Pressable>
+      </View>
+
       {/* Name */}
-      <Text className="text-text-secondary text-sm mb-1">Nom</Text>
+      <Text className="text-text-secondary text-sm mb-1">
+        {habitType === "positive" ? "Que veux-tu faire ?" : "Que veux-tu eviter ?"}
+      </Text>
       <TextInput
         value={name}
         onChangeText={setName}
-        placeholder="Ex: Meditation"
+        placeholder={habitType === "positive" ? "Ex: Meditation" : "Ex: Pas de reseaux sociaux"}
         placeholderTextColor={colors.textMuted}
         className="bg-surface-light rounded-button px-4 py-3 text-text text-base mb-4"
       />

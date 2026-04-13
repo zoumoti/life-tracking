@@ -14,23 +14,30 @@ type Props = {
 };
 
 export function HabitItem({ habit, completed, streak, onToggle, onPress, onLongPress }: Props) {
+  const isAvoid = habit.habit_type === "avoid";
+
   return (
     <Pressable
       onPress={onPress}
       onLongPress={onLongPress}
       className="flex-row items-center py-3 px-3 active:opacity-80"
     >
-      {/* Checkbox */}
+      {/* Checkbox — shield for avoid habits, check for positive */}
       <Pressable
         onPress={onToggle}
         hitSlop={8}
         className={`w-7 h-7 rounded-full items-center justify-center mr-3 border-2 ${
           completed
-            ? "bg-primary border-primary"
+            ? isAvoid
+              ? "bg-success border-success"
+              : "bg-primary border-primary"
             : "border-text-muted"
         }`}
+        style={completed && isAvoid ? { backgroundColor: colors.success, borderColor: colors.success } : undefined}
       >
-        {completed && <Feather name="check" size={16} color="#fff" />}
+        {completed && (
+          <Feather name={isAvoid ? "shield" : "check"} size={isAvoid ? 14 : 16} color="#fff" />
+        )}
       </Pressable>
 
       {/* Icon */}
@@ -55,7 +62,7 @@ export function HabitItem({ habit, completed, streak, onToggle, onPress, onLongP
       </Text>
 
       {/* Streak */}
-      <StreakBadge current={streak.current} warning={streak.warning} />
+      <StreakBadge current={streak.current} warning={streak.warning} isAvoid={isAvoid} />
 
       {/* Chevron */}
       <Feather name="chevron-right" size={18} color={colors.textMuted} style={{ marginLeft: 8 }} />

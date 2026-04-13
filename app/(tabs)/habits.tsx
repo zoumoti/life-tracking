@@ -76,6 +76,7 @@ export default function HabitsScreen() {
         name: data.name,
         icon: data.icon,
         color: data.color,
+        habit_type: data.habit_type,
         frequency_type: data.frequency_type,
         frequency_value: data.frequency_value,
         frequency_days: data.frequency_days.length > 0 ? data.frequency_days : null,

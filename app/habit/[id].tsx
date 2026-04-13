@@ -100,12 +100,21 @@ export default function HabitDetailScreen() {
             />
           </View>
           <View className="flex-1">
-            <Text className="text-text text-xl font-bold">{habit.name}</Text>
+            <View className="flex-row items-center gap-2">
+              <Text className="text-text text-xl font-bold">{habit.name}</Text>
+              {habit.habit_type === "avoid" && (
+                <View className="bg-surface-light px-2 py-0.5 rounded-full">
+                  <Text className="text-text-secondary text-xs">Eviter</Text>
+                </View>
+              )}
+            </View>
             {streak.warning && (
               <View className="flex-row items-center mt-1">
                 <Feather name="alert-triangle" size={14} color={colors.warning} />
                 <Text className="text-xs ml-1" style={{ color: colors.warning }}>
-                  Attention ! Un jour de plus et le streak tombe
+                  {habit.habit_type === "avoid"
+                    ? "Attention ! Un ecart de plus et le compteur tombe"
+                    : "Attention ! Un jour de plus et le streak tombe"}
                 </Text>
               </View>
             )}
@@ -119,6 +128,7 @@ export default function HabitDetailScreen() {
           completionRate={stats.completionRate30}
           bestDay={stats.bestDay}
           worstDay={stats.worstDay}
+          isAvoid={habit.habit_type === "avoid"}
         />
 
         {/* Streak Chart */}
