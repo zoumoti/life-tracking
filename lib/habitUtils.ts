@@ -24,18 +24,17 @@ export function isHabitScheduledForDate(habit: Habit, dateStr: string): boolean 
  * Returns { current, best, warning }.
  * - warning=true means 1 scheduled day was missed — next miss breaks streak.
  * - Streak breaks after 2 CONSECUTIVE scheduled-but-missed days.
+ * - Today is skipped if not yet completed (day still in progress).
  */
 export function calculateStreak(
   habit: Habit,
   completedDates: Set<string>,
   today: string = toDateString()
 ): { current: number; best: number; warning: boolean } {
+  // Pass 1: walk backwards from today to find current streak
   let current = 0;
-  let best = 0;
   let warning = false;
-  let consecutiveMisses = 0;
-  let streakActive = true;
-  let tempStreak = 0;
+  let usedGrace = false;
 
   for (let i = 0; i < 365; i++) {
     const dateStr = addDays(today, -i);
@@ -43,33 +42,43 @@ export function calculateStreak(
     if (!isHabitScheduledForDate(habit, dateStr)) continue;
 
     if (completedDates.has(dateStr)) {
-      consecutiveMisses = 0;
-      if (streakActive) {
-        tempStreak++;
-      }
+      current++;
+    } else if (i === 0) {
+      // Today not done yet — day still in progress, skip
+      continue;
+    } else if (!usedGrace) {
+      // First miss — grace period ("never miss twice")
+      usedGrace = true;
+      warning = true;
     } else {
-      consecutiveMisses++;
-      if (consecutiveMisses >= 2) {
-        if (streakActive) {
-          streakActive = false;
-        }
-      } else if (streakActive && i === 0) {
-        consecutiveMisses = 0;
-        continue;
-      } else if (streakActive) {
-        warning = true;
-      }
-    }
-
-    if (!streakActive && tempStreak > 0) {
-      best = Math.max(best, tempStreak);
-      tempStreak = completedDates.has(dateStr) ? 1 : 0;
-      streakActive = false;
+      // Second consecutive miss — streak broken
+      break;
     }
   }
 
-  current = streakActive ? tempStreak : 0;
-  best = Math.max(best, tempStreak, current);
+  // Pass 2: walk forward chronologically to find best streak ever
+  let best = current;
+  let tempStreak = 0;
+  let tempUsedGrace = false;
+  const startDate = habit.created_at.slice(0, 10);
+
+  for (let i = 365; i >= 0; i--) {
+    const dateStr = addDays(today, -i);
+    if (dateStr < startDate) continue;
+    if (!isHabitScheduledForDate(habit, dateStr)) continue;
+
+    if (completedDates.has(dateStr)) {
+      tempStreak++;
+      best = Math.max(best, tempStreak);
+    } else if (!tempUsedGrace) {
+      // Grace: streak continues but missed day not counted
+      tempUsedGrace = true;
+    } else {
+      // Streak broken, reset
+      tempStreak = 0;
+      tempUsedGrace = false;
+    }
+  }
 
   return { current, best, warning };
 }

@@ -19,38 +19,36 @@ export function StreakChart({ habit, completedDates, days = 30 }: Props) {
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
 
-  // Build streak data points
+  // Build streak data points (walk forward chronologically)
   const points: { x: number; y: number }[] = [];
   let streak = 0;
-  let consecutiveMisses = 0;
+  let usedGrace = false;
   let maxStreak = 1;
 
   for (let i = days - 1; i >= 0; i--) {
     const dateStr = addDays(today, -i);
+    const xPos = padding.left + ((days - 1 - i) / (days - 1)) * chartW;
+
     if (!isHabitScheduledForDate(habit, dateStr)) {
-      points.push({
-        x: padding.left + ((days - 1 - i) / (days - 1)) * chartW,
-        y: 0, // placeholder, will recalc
-      });
+      // Non-scheduled day: carry previous streak value
+      points.push({ x: xPos, y: streak });
       continue;
     }
 
     if (completedDates.has(dateStr)) {
       streak++;
-      consecutiveMisses = 0;
+      usedGrace = false;
+    } else if (!usedGrace) {
+      // Grace period: streak stays but doesn't increment
+      usedGrace = true;
     } else {
-      consecutiveMisses++;
-      if (consecutiveMisses >= 2) {
-        streak = 0;
-        consecutiveMisses = 0;
-      }
+      // Second miss: streak breaks
+      streak = 0;
+      usedGrace = false;
     }
 
     maxStreak = Math.max(maxStreak, streak);
-    points.push({
-      x: padding.left + ((days - 1 - i) / (days - 1)) * chartW,
-      y: streak,
-    });
+    points.push({ x: xPos, y: streak });
   }
 
   // Normalize y values

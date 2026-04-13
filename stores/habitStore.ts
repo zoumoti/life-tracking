@@ -127,8 +127,11 @@ export const useHabitStore = createPersistedStore<HabitState>(
       const userId = (await supabase.auth.getUser()).data.user?.id;
       if (!userId) return;
 
+      // Save previous state for rollback
+      const previousCompletions = get().completions;
+
       // Optimistic update
-      const newCompletions = { ...get().completions };
+      const newCompletions = { ...previousCompletions };
       if (isCompleted) {
         delete newCompletions[key];
       } else {
@@ -136,18 +139,25 @@ export const useHabitStore = createPersistedStore<HabitState>(
       }
       set({ completions: newCompletions });
 
-      // Sync with Supabase
-      if (isCompleted) {
-        await supabase
-          .from("habit_completions")
-          .delete()
-          .eq("habit_id", habitId)
-          .eq("completed_date", date)
-          .eq("user_id", userId);
-      } else {
-        await supabase
-          .from("habit_completions")
-          .insert({ habit_id: habitId, user_id: userId, completed_date: date });
+      // Sync with Supabase — rollback on failure
+      try {
+        if (isCompleted) {
+          const { error } = await supabase
+            .from("habit_completions")
+            .delete()
+            .eq("habit_id", habitId)
+            .eq("completed_date", date)
+            .eq("user_id", userId);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from("habit_completions")
+            .insert({ habit_id: habitId, user_id: userId, completed_date: date });
+          if (error) throw error;
+        }
+      } catch {
+        // Rollback optimistic update
+        set({ completions: previousCompletions });
       }
     },
 
