@@ -1,5 +1,6 @@
 import "../global.css";
 import { useEffect } from "react";
+import { View, ActivityIndicator } from "react-native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -14,7 +15,11 @@ export default function RootLayout() {
   }, []);
 
   if (loading) {
-    return null;
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background, alignItems: "center", justifyContent: "center" }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
   }
 
   return (
