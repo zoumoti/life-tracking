@@ -7,7 +7,7 @@ import type { Tables } from "../../types/database";
 
 type Props = {
   objectives: Tables<"objectives">[];
-  onPressObjective: (objective: Tables<"objectives">) => void;
+  onPressObjective: () => void;
 };
 
 function getDeadlineStatus(objective: Tables<"objectives">): {
@@ -57,12 +57,12 @@ export function HomeObjectivesList({ objectives, onPressObjective }: Props) {
           const status = getDeadlineStatus(obj);
 
           return (
-            <Pressable
-              key={obj.id}
-              onPress={() => onPressObjective(obj)}
-              className="px-4 py-3 active:opacity-80"
-            >
-              {index > 0 && <View className="absolute top-0 left-4 right-4 h-px bg-surface" />}
+            <View key={obj.id}>
+              {index > 0 && <View className="h-px bg-surface mx-4" />}
+              <Pressable
+                onPress={onPressObjective}
+                className="px-4 py-3 active:opacity-80"
+              >
 
               <View className="flex-row items-center justify-between mb-1">
                 <Text className="text-text text-sm flex-1 mr-2" numberOfLines={1}>
@@ -83,7 +83,8 @@ export function HomeObjectivesList({ objectives, onPressObjective }: Props) {
                   {Math.round(progress * 100)}%
                 </Text>
               </View>
-            </Pressable>
+              </Pressable>
+            </View>
           );
         })}
       </Card>

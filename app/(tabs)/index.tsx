@@ -60,6 +60,14 @@ export default function HomeScreen() {
     router.push("/(tabs)/sport/active-workout" as any);
   };
 
+  const handleStartProgram = (program: (typeof programs)[0]) => {
+    const exercises = program.exercises
+      .sort((a, b) => a.sort_order - b.sort_order)
+      .map((pe) => ({ id: pe.exercise.id, name: pe.exercise.name }));
+    startSession(program.id, program.name, exercises);
+    router.push("/(tabs)/sport/active-workout" as any);
+  };
+
   const handlePressObjective = () => {
     router.push("/(tabs)/objectives" as any);
   };
@@ -81,6 +89,7 @@ export default function HomeScreen() {
           currentSession={currentSession}
           programs={programs}
           onStartFreeSession={handleStartFreeSession}
+          onStartProgram={handleStartProgram}
         />
 
         <HomeObjectivesList

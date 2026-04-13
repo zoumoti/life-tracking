@@ -14,12 +14,13 @@ type Props = {
   programs: {
     id: string;
     name: string;
-    exercises: any[];
+    exercises: { exercise: { id: string; name: string }; sort_order: number }[];
   }[];
   onStartFreeSession: () => void;
+  onStartProgram: (program: Props["programs"][0]) => void;
 };
 
-export function HomeSportCard({ currentSession, programs, onStartFreeSession }: Props) {
+export function HomeSportCard({ currentSession, programs, onStartFreeSession, onStartProgram }: Props) {
   const router = useRouter();
 
   return (
@@ -51,9 +52,7 @@ export function HomeSportCard({ currentSession, programs, onStartFreeSession }: 
             </View>
             <Button
               title="Demarrer"
-              onPress={() => {
-                router.push("/(tabs)/sport" as any);
-              }}
+              onPress={() => onStartProgram(programs[0])}
               className="px-4"
             />
           </View>
