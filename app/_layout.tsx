@@ -31,6 +31,10 @@ export default function RootLayout() {
         ) : (
           <Stack.Screen name="(auth)" />
         )}
+        <Stack.Screen
+          name="habit/[id]"
+          options={{ headerShown: true }}
+        />
       </Stack>
     </GestureHandlerRootView>
   );
