@@ -24,7 +24,7 @@ function getDeadlineStatus(objective: Tables<"objectives">): {
 
   const timeProgress = Math.min(elapsedDays / totalDays, 1);
   const valueProgress =
-    objective.target_value > 0 ? objective.current_value / objective.target_value : 0;
+    (objective.target_value ?? 0) > 0 ? (objective.current_value ?? 0) / (objective.target_value ?? 1) : 0;
 
   if (today > objective.deadline) return { label: "Expire", color: colors.danger };
   if (valueProgress >= timeProgress) return { label: "En avance", color: colors.success };
@@ -51,8 +51,8 @@ export function HomeObjectivesList({ objectives, onPressObjective }: Props) {
       <Card className="p-0">
         {activeObjectives.map((obj, index) => {
           const progress =
-            obj.target_value > 0
-              ? Math.min(obj.current_value / obj.target_value, 1)
+            (obj.target_value ?? 0) > 0
+              ? Math.min((obj.current_value ?? 0) / (obj.target_value ?? 1), 1)
               : 0;
           const status = getDeadlineStatus(obj);
 

@@ -60,7 +60,7 @@ export default function HomeScreen() {
     router.push("/(tabs)/sport/active-workout" as any);
   };
 
-  const handleStartProgram = (program: (typeof programs)[0]) => {
+  const handleStartProgram = (program: { id: string; name: string; exercises: { exercise: { id: string; name: string }; sort_order: number }[] }) => {
     const exercises = program.exercises
       .sort((a, b) => a.sort_order - b.sort_order)
       .map((pe) => ({ id: pe.exercise.id, name: pe.exercise.name }));
