@@ -34,6 +34,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       habits: {
         Row: {
@@ -93,6 +94,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       habit_completions: {
         Row: {
@@ -119,6 +121,7 @@ export interface Database {
           note?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       visions: {
         Row: {
@@ -126,6 +129,8 @@ export interface Database {
           user_id: string;
           title: string;
           description: string;
+          icon: string;
+          color: string;
           target_date: string | null;
           sort_order: number;
           created_at: string;
@@ -136,6 +141,8 @@ export interface Database {
           user_id: string;
           title: string;
           description?: string;
+          icon?: string;
+          color?: string;
           target_date?: string | null;
           sort_order?: number;
           created_at?: string;
@@ -146,11 +153,14 @@ export interface Database {
           user_id?: string;
           title?: string;
           description?: string;
+          icon?: string;
+          color?: string;
           target_date?: string | null;
           sort_order?: number;
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       objectives: {
         Row: {
@@ -201,6 +211,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       objective_updates: {
         Row: {
@@ -230,6 +241,7 @@ export interface Database {
           note?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       exercises: {
         Row: {
@@ -262,6 +274,7 @@ export interface Database {
           is_compound?: boolean;
           created_at?: string;
         };
+        Relationships: [];
       };
       workout_programs: {
         Row: {
@@ -291,6 +304,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       workout_program_exercises: {
         Row: {
@@ -329,6 +343,7 @@ export interface Database {
           notes?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       workout_sessions: {
         Row: {
@@ -361,6 +376,7 @@ export interface Database {
           notes?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       workout_sets: {
         Row: {
@@ -399,6 +415,7 @@ export interface Database {
           notes?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
       running_logs: {
         Row: {
@@ -443,6 +460,7 @@ export interface Database {
           linked_objective_id?: string | null;
           created_at?: string;
         };
+        Relationships: [];
       };
     };
     Views: {
