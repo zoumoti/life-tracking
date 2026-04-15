@@ -465,6 +465,105 @@ export interface Database {
         };
         Relationships: [];
       };
+      accounts: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          icon: string;
+          color: string;
+          balance: number;
+          createdAt: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          icon?: string;
+          color?: string;
+          balance?: number;
+          createdAt?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          icon?: string;
+          color?: string;
+          balance?: number;
+          createdAt?: string;
+        };
+        Relationships: [];
+      };
+      transactions: {
+        Row: {
+          id: string;
+          user_id: string;
+          type: string;
+          amount: number;
+          category: string;
+          accountId: string;
+          toAccountId: string | null;
+          date: string;
+          description: string;
+          createdAt: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          type: string;
+          amount: number;
+          category?: string;
+          accountId: string;
+          toAccountId?: string | null;
+          date: string;
+          description?: string;
+          createdAt?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          type?: string;
+          amount?: number;
+          category?: string;
+          accountId?: string;
+          toAccountId?: string | null;
+          date?: string;
+          description?: string;
+          createdAt?: string;
+        };
+        Relationships: [];
+      };
+      financeCategories: {
+        Row: {
+          id: string;
+          user_id: string;
+          name: string;
+          icon: string;
+          appliesTo: string;
+          isDefault: boolean;
+          createdAt: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          name: string;
+          icon?: string;
+          appliesTo?: string;
+          isDefault?: boolean;
+          createdAt?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          name?: string;
+          icon?: string;
+          appliesTo?: string;
+          isDefault?: boolean;
+          createdAt?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;
