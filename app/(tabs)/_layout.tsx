@@ -1,20 +1,24 @@
 import { Tabs } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useColors } from "../../lib/theme";
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets();
+  const c = useColors();
+
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.textMuted,
+        tabBarActiveTintColor: c.primary,
+        tabBarInactiveTintColor: c.textMuted,
         tabBarStyle: {
-          backgroundColor: colors.background,
-          borderTopColor: colors.surface,
-          borderTopWidth: 1,
-          height: 60,
-          paddingBottom: 8,
+          backgroundColor: c.background,
+          borderTopWidth: 0,
+          elevation: 0,
+          height: 60 + insets.bottom,
+          paddingBottom: 8 + insets.bottom,
           paddingTop: 8,
         },
         tabBarLabelStyle: {
@@ -59,6 +63,28 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="finance"
+        options={{
+          title: "Finance",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="dollar-sign" size={size} color={color} />
+          ),
+        }}
+      />
+      {/* Hide sub-routes from tab bar */}
+      <Tabs.Screen name="sport/index" options={{ href: null }} />
+      <Tabs.Screen name="sport/exercises" options={{ href: null }} />
+      <Tabs.Screen name="sport/programs" options={{ href: null }} />
+      <Tabs.Screen name="sport/program-detail" options={{ href: null }} />
+      <Tabs.Screen name="sport/active-workout" options={{ href: null }} />
+      <Tabs.Screen name="sport/workout-history" options={{ href: null }} />
+      <Tabs.Screen name="sport/workout-detail" options={{ href: null }} />
+      <Tabs.Screen name="sport/running" options={{ href: null }} />
+      <Tabs.Screen name="sport/add-run" options={{ href: null }} />
+      <Tabs.Screen name="sport/_layout" options={{ href: null }} />
+      <Tabs.Screen name="finance/index" options={{ href: null }} />
+      <Tabs.Screen name="finance/_layout" options={{ href: null }} />
     </Tabs>
   );
 }
