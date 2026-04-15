@@ -1,7 +1,8 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import { View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
+import { View, Text, Pressable, ScrollView, ActivityIndicator, AppState } from "react-native";
 import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { Feather } from "@expo/vector-icons";
+import { useNavigation } from "expo-router";
 import { SafeScreen } from "../../../components/SafeScreen";
 import { useColors } from "../../../lib/theme";
 import { useTaskStore } from "../../../stores/taskStore";
@@ -37,15 +38,35 @@ export default function TasksScreen() {
   const [confirmVisible, setConfirmVisible] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
 
+  const navigation = useNavigation();
+
   // Fetch on mount
   useEffect(() => {
     fetchTasks();
   }, []);
 
-  // Google sync on mount + interval
+  // Sync when tab gets focus (switching tabs, coming back to app)
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchTasks();
+      if (isConnected) syncWithGoogle();
+    });
+    return unsubscribe;
+  }, [navigation, isConnected]);
+
+  // Also sync on app foreground
+  useEffect(() => {
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active" && isConnected) {
+        syncWithGoogle();
+      }
+    });
+    return () => sub.remove();
+  }, [isConnected]);
+
+  // Background sync every 15 min
   useEffect(() => {
     if (isConnected) {
-      syncWithGoogle();
       const interval = setInterval(() => syncWithGoogle(), 15 * 60 * 1000);
       return () => clearInterval(interval);
     }

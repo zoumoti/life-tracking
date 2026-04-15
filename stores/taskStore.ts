@@ -190,28 +190,58 @@ export const useTaskStore = createPersistedStore<TaskState>(
       const googleTasks = await fetchGoogleTasks();
       if (!googleTasks) return;
 
+      const userId = await getUserId();
+      if (!userId) return;
+
       const tasks = get().tasks;
 
       for (const gt of googleTasks) {
         const local = tasks.find((t) => t.google_task_id === gt.id);
-        if (!local) continue;
 
-        const googleCompleted = gt.status === "completed";
-        if (local.completed !== googleCompleted) {
-          const completed_at = googleCompleted ? new Date().toISOString() : null;
+        if (local) {
+          // Existing task — sync completed status from Google
+          const googleCompleted = gt.status === "completed";
+          if (local.completed !== googleCompleted) {
+            const completed_at = googleCompleted ? new Date().toISOString() : null;
 
-          await getSupabase()
+            await getSupabase()
+              .from("tasks")
+              .update({ completed: googleCompleted, completed_at })
+              .eq("id", local.id);
+
+            set({
+              tasks: get().tasks.map((t) =>
+                t.id === local.id
+                  ? { ...t, completed: googleCompleted, completed_at }
+                  : t
+              ),
+            });
+          }
+        } else {
+          // New task from Google — import it
+          if (!gt.title || gt.title.trim() === "") continue;
+
+          const dueDate = gt.due ? gt.due.slice(0, 10) : null;
+          const googleCompleted = gt.status === "completed";
+
+          const { data, error } = await getSupabase()
             .from("tasks")
-            .update({ completed: googleCompleted, completed_at })
-            .eq("id", local.id);
+            .insert({
+              user_id: userId,
+              title: gt.title,
+              notes: gt.notes ?? null,
+              due_date: dueDate,
+              priority: "normal",
+              completed: googleCompleted,
+              completed_at: googleCompleted ? new Date().toISOString() : null,
+              google_task_id: gt.id,
+            })
+            .select()
+            .single();
 
-          set({
-            tasks: get().tasks.map((t) =>
-              t.id === local.id
-                ? { ...t, completed: googleCompleted, completed_at }
-                : t
-            ),
-          });
+          if (!error && data) {
+            set({ tasks: [data as unknown as Task, ...get().tasks] });
+          }
         }
       }
     },
