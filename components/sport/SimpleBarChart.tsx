@@ -1,4 +1,5 @@
 import { View, Text } from "react-native";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   data: { label: string; value: number }[];
@@ -7,6 +8,7 @@ type Props = {
 };
 
 export function SimpleBarChart({ data, unit = "", height = 120 }: Props) {
+  const c = useColors();
   const maxValue = Math.max(...data.map((d) => d.value), 1);
 
   return (
@@ -15,14 +17,14 @@ export function SimpleBarChart({ data, unit = "", height = 120 }: Props) {
         const barHeight = (item.value / maxValue) * height * 0.8;
         return (
           <View key={i} className="items-center flex-1 mx-1">
-            <Text className="text-text-secondary text-xs mb-1">
+            <Text className="text-xs mb-1" style={{ color: c.textSecondary }}>
               {item.value}{unit}
             </Text>
             <View
-              className="bg-primary rounded-t-sm w-full"
-              style={{ height: Math.max(barHeight, 4) }}
+              className="rounded-t-sm w-full"
+              style={{ height: Math.max(barHeight, 4), backgroundColor: c.primary }}
             />
-            <Text className="text-text-muted text-xs mt-1">{item.label}</Text>
+            <Text className="text-xs mt-1" style={{ color: c.textMuted }}>{item.label}</Text>
           </View>
         );
       })}

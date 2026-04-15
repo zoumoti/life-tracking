@@ -7,10 +7,11 @@ import { Button } from "../../../components/ui/Button";
 import { useRunningStore } from "../../../stores/runningStore";
 import { formatPace } from "../../../lib/formatters";
 import { RUNNING_TYPES, RUNNING_TYPE_LABELS } from "../../../lib/constants";
-import { colors } from "../../../lib/theme";
+import { useColors } from "../../../lib/theme";
 import type { RunningType } from "../../../lib/constants";
 
 export default function AddRunScreen() {
+  const c = useColors();
   const router = useRouter();
   const { addRun } = useRunningStore();
   const [distance, setDistance] = useState("");
@@ -47,78 +48,81 @@ export default function AddRunScreen() {
     <SafeScreen>
       <View className="flex-row items-center mb-6">
         <Pressable onPress={() => router.back()} className="p-2">
-          <Feather name="arrow-left" size={24} color={colors.text} />
+          <Feather name="arrow-left" size={24} color={c.text} />
         </Pressable>
-        <Text className="text-text text-xl font-bold ml-2">Nouvelle course</Text>
+        <Text style={{ color: c.text }} className="text-xl font-bold ml-2">Nouvelle course</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <Text className="text-text-secondary text-sm mb-2">Distance (km)</Text>
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Distance (km)</Text>
         <TextInput
-          className="bg-surface text-text rounded-button px-4 py-3 mb-4 text-base"
+          style={{ backgroundColor: c.surface, color: c.text }}
+          className="rounded-button px-4 py-3 mb-4 text-base"
           placeholder="8.5"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={c.textMuted}
           keyboardType="numeric"
           value={distance}
           onChangeText={setDistance}
         />
 
-        <Text className="text-text-secondary text-sm mb-2">Duree (minutes)</Text>
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Duree (minutes)</Text>
         <TextInput
-          className="bg-surface text-text rounded-button px-4 py-3 mb-4 text-base"
+          style={{ backgroundColor: c.surface, color: c.text }}
+          className="rounded-button px-4 py-3 mb-4 text-base"
           placeholder="45"
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={c.textMuted}
           keyboardType="numeric"
           value={duration}
           onChangeText={setDuration}
         />
 
-        <View className="bg-surface rounded-card px-4 py-3 mb-4">
-          <Text className="text-text-secondary text-sm">Allure</Text>
-          <Text className="text-primary font-bold text-xl">
+        <View style={{ backgroundColor: c.surface }} className="rounded-card px-4 py-3 mb-4">
+          <Text style={{ color: c.textSecondary }} className="text-sm">Allure</Text>
+          <Text style={{ color: c.primary }} className="font-bold text-xl">
             {distanceNum > 0 && durationNum > 0
               ? `${formatPace(durationNum, distanceNum)} /km`
               : "--:-- /km"}
           </Text>
         </View>
 
-        <Text className="text-text-secondary text-sm mb-2">Type</Text>
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Type</Text>
         <View className="flex-row flex-wrap gap-2 mb-4">
           {RUNNING_TYPES.map((t) => (
             <Pressable
               key={t}
-              className={`px-4 py-2 rounded-button ${type === t ? "bg-primary" : "bg-surface"}`}
+              style={{ backgroundColor: type === t ? c.primary : c.surface }}
+              className="px-4 py-2 rounded-button"
               onPress={() => setType(t)}
             >
-              <Text className={`text-sm ${type === t ? "text-white font-bold" : "text-text"}`}>
+              <Text style={{ color: type === t ? c.primaryOnText : c.text }} className={`text-sm ${type === t ? "font-bold" : ""}`}>
                 {RUNNING_TYPE_LABELS[t]}
               </Text>
             </Pressable>
           ))}
         </View>
 
-        <Text className="text-text-secondary text-sm mb-2">Ressenti</Text>
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Ressenti</Text>
         <View className="flex-row justify-around mb-4">
           {[1, 2, 3, 4, 5].map((n) => (
             <Pressable
               key={n}
               onPress={() => setEffort(n)}
-              className={`w-12 h-12 rounded-full items-center justify-center ${
-                effort === n ? "bg-primary" : "bg-surface"
-              }`}
+              style={{ backgroundColor: effort === n ? c.primary : c.surface }}
+              className="w-12 h-12 rounded-full items-center justify-center"
             >
-              <Text className={`text-base font-bold ${effort === n ? "text-white" : "text-text"}`}>
+              <Text style={{ color: effort === n ? c.primaryOnText : c.text }} className={`text-base ${effort === n ? "font-bold" : ""}`}>
                 {n}
               </Text>
             </Pressable>
           ))}
         </View>
 
-        <Text className="text-text-secondary text-sm mb-2">Notes (optionnel)</Text>
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Notes (optionnel)</Text>
         <TextInput
-          className="bg-surface text-text rounded-button px-4 py-3 mb-6 text-sm"
+          style={{ backgroundColor: c.surface, color: c.text }}
+          className="rounded-button px-4 py-3 mb-6 text-sm"
           placeholder="Comment s'est passee la course..."
-          placeholderTextColor={colors.textMuted}
+          placeholderTextColor={c.textMuted}
           multiline
           numberOfLines={3}
           textAlignVertical="top"

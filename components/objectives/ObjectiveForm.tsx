@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { Button } from "../ui/Button";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type Props = {
@@ -22,6 +22,7 @@ type Props = {
 };
 
 export function ObjectiveForm({ visions, initialVisionId, initial, onSubmit, onCancel, loading }: Props) {
+  const c = useColors();
   const [visionId, setVisionId] = useState(initial?.vision_id ?? initialVisionId ?? visions[0]?.id ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
@@ -46,7 +47,7 @@ export function ObjectiveForm({ visions, initialVisionId, initial, onSubmit, onC
   return (
     <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
       {/* Vision selector */}
-      <Text className="text-text-secondary text-sm mb-1">Vision parente</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Vision parente</Text>
       <View className="flex-row flex-wrap gap-2 mb-4">
         {visions.map((v) => (
           <Pressable
@@ -54,41 +55,44 @@ export function ObjectiveForm({ visions, initialVisionId, initial, onSubmit, onC
             onPress={() => setVisionId(v.id)}
             className="px-3 py-2 rounded-button"
             style={{
-              backgroundColor: visionId === v.id ? v.color : colors.surfaceLight,
+              backgroundColor: visionId === v.id ? v.color : c.surfaceLight,
             }}
           >
-            <Text className="text-text text-sm">{v.title}</Text>
+            <Text className="text-sm" style={{ color: c.text }}>{v.title}</Text>
           </Pressable>
         ))}
       </View>
 
       {/* Title */}
-      <Text className="text-text-secondary text-sm mb-1">Nom de l'objectif</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Nom de l'objectif</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-4 text-base"
+        className="rounded-button px-4 py-3 mb-4 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="Ex: Bench press 100kg"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={title}
         onChangeText={setTitle}
       />
 
       {/* Description */}
-      <Text className="text-text-secondary text-sm mb-1">Description (optionnel)</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Description (optionnel)</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-4 text-base"
+        className="rounded-button px-4 py-3 mb-4 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="Details supplementaires..."
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={description}
         onChangeText={setDescription}
         multiline
       />
 
       {/* Unit */}
-      <Text className="text-text-secondary text-sm mb-1">Unite de mesure</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Unite de mesure</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-4 text-base"
+        className="rounded-button px-4 py-3 mb-4 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="Ex: kg, km, min, %"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={unit}
         onChangeText={setUnit}
       />
@@ -96,22 +100,24 @@ export function ObjectiveForm({ visions, initialVisionId, initial, onSubmit, onC
       {/* Current + Target values */}
       <View className="flex-row gap-3 mb-4">
         <View className="flex-1">
-          <Text className="text-text-secondary text-sm mb-1">Valeur actuelle</Text>
+          <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Valeur actuelle</Text>
           <TextInput
-            className="bg-surface-light text-text rounded-button px-4 py-3 text-base"
+            className="rounded-button px-4 py-3 text-base"
+            style={{ backgroundColor: c.surfaceLight, color: c.text }}
             placeholder="0"
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor={c.textMuted}
             value={currentValue}
             onChangeText={setCurrentValue}
             keyboardType="numeric"
           />
         </View>
         <View className="flex-1">
-          <Text className="text-text-secondary text-sm mb-1">Valeur cible</Text>
+          <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Valeur cible</Text>
           <TextInput
-            className="bg-surface-light text-text rounded-button px-4 py-3 text-base"
+            className="rounded-button px-4 py-3 text-base"
+            style={{ backgroundColor: c.surfaceLight, color: c.text }}
             placeholder="100"
-            placeholderTextColor={colors.textMuted}
+            placeholderTextColor={c.textMuted}
             value={targetValue}
             onChangeText={setTargetValue}
             keyboardType="numeric"
@@ -120,17 +126,18 @@ export function ObjectiveForm({ visions, initialVisionId, initial, onSubmit, onC
       </View>
 
       {/* Deadline */}
-      <Text className="text-text-secondary text-sm mb-1">Deadline (AAAA-MM-JJ)</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Deadline (AAAA-MM-JJ)</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-6 text-base"
+        className="rounded-button px-4 py-3 mb-6 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="2026-09-01"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={deadline}
         onChangeText={setDeadline}
       />
 
       {/* Actions */}
-      <View className="flex-row gap-3">
+      <View className="flex-row gap-3 mb-8">
         <Button title="Annuler" variant="secondary" onPress={onCancel} className="flex-1" />
         <Button
           title={initial ? "Modifier" : "Creer"}

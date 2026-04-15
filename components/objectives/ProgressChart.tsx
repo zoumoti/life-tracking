@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import Svg, { Line, Polyline, Circle, Rect } from "react-native-svg";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type Props = {
@@ -16,6 +16,7 @@ export function ProgressChart({
   width = 320,
   height = 180,
 }: Props) {
+  const c = useColors();
   const padding = { top: 16, right: 16, bottom: 24, left: 40 };
   const chartW = width - padding.left - padding.right;
   const chartH = height - padding.top - padding.bottom;
@@ -72,7 +73,7 @@ export function ProgressChart({
           y={padding.top}
           width={chartW}
           height={chartH}
-          fill={colors.surface}
+          fill={c.surface}
           rx={8}
         />
 
@@ -84,7 +85,7 @@ export function ProgressChart({
             y1={toY(val)}
             x2={padding.left + chartW}
             y2={toY(val)}
-            stroke={colors.surfaceLight}
+            stroke={c.surfaceLight}
             strokeWidth={1}
             strokeDasharray="4,4"
           />
@@ -96,7 +97,7 @@ export function ProgressChart({
           y1={idealStartY}
           x2={idealEndX}
           y2={idealEndY}
-          stroke={colors.textMuted}
+          stroke={c.textMuted}
           strokeWidth={1.5}
           strokeDasharray="6,4"
         />
@@ -105,7 +106,7 @@ export function ProgressChart({
         <Polyline
           points={realPoints}
           fill="none"
-          stroke={colors.primary}
+          stroke={c.primary}
           strokeWidth={2.5}
           strokeLinejoin="round"
           strokeLinecap="round"
@@ -118,7 +119,7 @@ export function ProgressChart({
             cx={toX(p.time)}
             cy={toY(p.value)}
             r={3.5}
-            fill={colors.primary}
+            fill={c.primary}
           />
         ))}
       </Svg>
@@ -126,12 +127,12 @@ export function ProgressChart({
       {/* Legend */}
       <View className="flex-row items-center gap-4 mt-2 px-2">
         <View className="flex-row items-center gap-1">
-          <View style={{ width: 12, height: 3, backgroundColor: colors.primary, borderRadius: 2 }} />
-          <Text className="text-text-muted text-xs">Reel</Text>
+          <View style={{ width: 12, height: 3, backgroundColor: c.primary, borderRadius: 2 }} />
+          <Text className="text-xs" style={{ color: c.textMuted }}>Reel</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <View style={{ width: 12, height: 1, backgroundColor: colors.textMuted, borderRadius: 1 }} />
-          <Text className="text-text-muted text-xs">Ideal</Text>
+          <View style={{ width: 12, height: 1, backgroundColor: c.textMuted, borderRadius: 1 }} />
+          <Text className="text-xs" style={{ color: c.textMuted }}>Ideal</Text>
         </View>
       </View>
     </View>

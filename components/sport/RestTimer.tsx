@@ -3,7 +3,7 @@ import { useEffect, useState, useRef } from "react";
 import { Feather } from "@expo/vector-icons";
 import * as Haptics from "expo-haptics";
 import { formatDuration } from "../../lib/formatters";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   startTime: number;
@@ -13,6 +13,7 @@ type Props = {
 const VIBRATION_THRESHOLDS = [60, 90, 120];
 
 export function RestTimer({ startTime, onSkip }: Props) {
+  const c = useColors();
   const [elapsed, setElapsed] = useState(0);
   const vibratedAt = useRef<Set<number>>(new Set());
 
@@ -35,15 +36,15 @@ export function RestTimer({ startTime, onSkip }: Props) {
   }, [startTime]);
 
   return (
-    <View className="flex-row items-center justify-between bg-primary/20 px-4 py-3 rounded-card my-2">
+    <View className="flex-row items-center justify-between px-4 py-3 rounded-card my-2" style={{ backgroundColor: c.primary + "33" }}>
       <View className="flex-row items-center">
-        <Feather name="clock" size={16} color={colors.primary} />
-        <Text className="text-primary font-bold text-base ml-2">
+        <Feather name="clock" size={16} color={c.primary} />
+        <Text className="font-bold text-base ml-2" style={{ color: c.primary }}>
           Repos : {formatDuration(elapsed)}
         </Text>
       </View>
-      <Pressable onPress={onSkip} className="bg-surface px-4 py-2 rounded-button active:opacity-80">
-        <Text className="text-text text-sm font-semibold">Skip</Text>
+      <Pressable onPress={onSkip} className="px-4 py-2 rounded-button active:opacity-80" style={{ backgroundColor: c.surface }}>
+        <Text className="text-sm font-semibold" style={{ color: c.text }}>Skip</Text>
       </Pressable>
     </View>
   );

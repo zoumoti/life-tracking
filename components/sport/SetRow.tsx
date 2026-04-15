@@ -1,7 +1,7 @@
 import { View, Text, TextInput, Pressable } from "react-native";
 import { useState } from "react";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   index: number;
@@ -12,35 +12,38 @@ type Props = {
 };
 
 export function SetRow({ index, completed, defaultWeight, defaultReps, onValidate }: Props) {
+  const c = useColors();
   const [weight, setWeight] = useState(String(defaultWeight ?? ""));
   const [reps, setReps] = useState(String(defaultReps ?? ""));
 
   if (completed) {
     return (
-      <View className="flex-row items-center py-2 px-3 bg-surface-light/30 rounded-sm mb-1">
-        <Text className="text-text-secondary w-8 text-sm">{index + 1}</Text>
-        <Text className="text-text flex-1 text-sm">{completed.weightKg} kg</Text>
-        <Text className="text-text flex-1 text-sm">{completed.reps} reps</Text>
-        <Feather name="check" size={16} color={colors.success} />
+      <View className="flex-row items-center py-2 px-3 rounded-sm mb-1" style={{ backgroundColor: c.surfaceLight + "4D" }}>
+        <Text className="w-8 text-sm" style={{ color: c.textSecondary }}>{index + 1}</Text>
+        <Text className="flex-1 text-sm" style={{ color: c.text }}>{completed.weightKg} kg</Text>
+        <Text className="flex-1 text-sm" style={{ color: c.text }}>{completed.reps} reps</Text>
+        <Feather name="check" size={16} color={c.success} />
       </View>
     );
   }
 
   return (
-    <View className="flex-row items-center py-2 px-3 bg-surface rounded-sm mb-1">
-      <Text className="text-text-secondary w-8 text-sm">{index + 1}</Text>
+    <View className="flex-row items-center py-2 px-3 rounded-sm mb-1" style={{ backgroundColor: c.surface }}>
+      <Text className="w-8 text-sm" style={{ color: c.textSecondary }}>{index + 1}</Text>
       <TextInput
-        className="text-text flex-1 text-sm bg-surface-light rounded-sm px-2 py-1 mr-2"
+        className="flex-1 text-sm rounded-sm px-2 py-1 mr-2"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="kg"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         keyboardType="numeric"
         value={weight}
         onChangeText={setWeight}
       />
       <TextInput
-        className="text-text flex-1 text-sm bg-surface-light rounded-sm px-2 py-1 mr-2"
+        className="flex-1 text-sm rounded-sm px-2 py-1 mr-2"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="reps"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         keyboardType="numeric"
         value={reps}
         onChangeText={setReps}
@@ -53,9 +56,10 @@ export function SetRow({ index, completed, defaultWeight, defaultReps, onValidat
             onValidate?.(w, r);
           }
         }}
-        className="bg-primary rounded-full w-8 h-8 items-center justify-center active:opacity-80"
+        className="rounded-full w-8 h-8 items-center justify-center active:opacity-80"
+        style={{ backgroundColor: c.primary }}
       >
-        <Feather name="check" size={16} color="#fff" />
+        <Feather name="check" size={16} color={c.primaryOnText} />
       </Pressable>
     </View>
   );

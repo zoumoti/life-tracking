@@ -13,7 +13,7 @@ import { WorkoutSummary } from "../../../components/sport/WorkoutSummary";
 import { useWorkoutStore } from "../../../stores/workoutStore";
 import { useExerciseStore } from "../../../stores/exerciseStore";
 import { formatDuration } from "../../../lib/formatters";
-import { colors } from "../../../lib/theme";
+import { useColors } from "../../../lib/theme";
 
 function useTimer(startedAt: number | null) {
   const [elapsed, setElapsed] = useState(0);
@@ -28,6 +28,7 @@ function useTimer(startedAt: number | null) {
 }
 
 export default function ActiveWorkoutScreen() {
+  const c = useColors();
   const router = useRouter();
   const {
     currentSession,
@@ -51,10 +52,14 @@ export default function ActiveWorkoutScreen() {
 
   const elapsed = useTimer(currentSession?.startedAt ?? null);
 
+  // Fetch data when session starts; reset summary only for a NEW session (not when session ends)
   useEffect(() => {
-    fetchExercises();
-    currentSession?.exercises.forEach((e) => fetchLastSets(e.exerciseId));
-  }, []);
+    if (currentSession) {
+      setSummary(null);
+      fetchExercises();
+      currentSession.exercises.forEach((e) => fetchLastSets(e.exerciseId));
+    }
+  }, [currentSession?.id]);
 
   const exercisePicker = ExercisePickerSheet({
     onSelect: (exercise) => {
@@ -83,13 +88,29 @@ export default function ActiveWorkoutScreen() {
     router.replace("/(tabs)/sport" as any);
   };
 
+  // Show summary after finishing (currentSession is null but summary exists)
+  if (summary) {
+    return (
+      <SafeScreen>
+        <WorkoutSummary
+          visible
+          duration={summary.duration}
+          totalVolume={summary.totalVolume}
+          totalSets={summary.totalSets}
+          records={summary.records}
+          onClose={handleSummaryClose}
+        />
+      </SafeScreen>
+    );
+  }
+
   if (!currentSession) {
     return (
       <SafeScreen>
         <View className="flex-1 items-center justify-center">
-          <Text className="text-text-secondary">Aucune seance en cours</Text>
+          <Text style={{ color: c.textSecondary }}>Aucune seance en cours</Text>
           <Pressable onPress={() => router.back()} className="mt-4">
-            <Text className="text-primary font-semibold">Retour</Text>
+            <Text style={{ color: c.primary }} className="font-semibold">Retour</Text>
           </Pressable>
         </View>
       </SafeScreen>
@@ -99,18 +120,19 @@ export default function ActiveWorkoutScreen() {
   return (
     <SafeScreen>
       {/* Global timer header */}
-      <View className="flex-row items-center justify-between mb-4 bg-surface rounded-card px-4 py-3">
+      <View style={{ backgroundColor: c.surface }} className="flex-row items-center justify-between mb-4 rounded-card px-4 py-3">
         <View className="flex-row items-center">
-          <Feather name="clock" size={20} color={colors.primary} />
-          <Text className="text-primary font-bold text-xl ml-2">
+          <Feather name="clock" size={20} color={c.primary} />
+          <Text style={{ color: c.primary }} className="font-bold text-xl ml-2">
             {formatDuration(elapsed)}
           </Text>
         </View>
         <Pressable
           onPress={() => setConfirmEnd(true)}
-          className="bg-danger px-4 py-2 rounded-button active:opacity-80"
+          style={{ backgroundColor: c.danger }}
+          className="px-4 py-2 rounded-button active:opacity-80"
         >
-          <Text className="text-white font-semibold text-sm">Terminer</Text>
+          <Text style={{ color: "#ffffff" }} className="font-semibold text-sm">Terminer</Text>
         </Pressable>
       </View>
 
@@ -119,12 +141,12 @@ export default function ActiveWorkoutScreen() {
           const lastSetInfo = lastSets[exercise.exerciseId];
           return (
             <Card key={`${exercise.exerciseId}-${exIndex}`} className="mb-4">
-              <Text className="text-text font-bold text-base mb-1">
+              <Text style={{ color: c.text }} className="font-bold text-base mb-1">
                 {exercise.exerciseName}
               </Text>
 
               {lastSetInfo && lastSetInfo.length > 0 && (
-                <Text className="text-text-muted text-xs mb-3">
+                <Text style={{ color: c.textMuted }} className="text-xs mb-3">
                   Derniere fois : {lastSetInfo[0].weightKg}kg x {lastSetInfo[0].reps}
                 </Text>
               )}
@@ -164,10 +186,11 @@ export default function ActiveWorkoutScreen() {
 
         <Pressable
           onPress={exercisePicker.open}
-          className="flex-row items-center justify-center py-4 mb-8 border border-dashed border-surface-light rounded-card active:opacity-70"
+          style={{ borderColor: c.surfaceLight }}
+          className="flex-row items-center justify-center py-4 mb-8 border border-dashed rounded-card active:opacity-70"
         >
-          <Feather name="plus" size={20} color={colors.primary} />
-          <Text className="text-primary font-semibold text-sm ml-2">
+          <Feather name="plus" size={20} color={c.primary} />
+          <Text style={{ color: c.primary }} className="font-semibold text-sm ml-2">
             Ajouter un exercice
           </Text>
         </Pressable>
@@ -185,16 +208,6 @@ export default function ActiveWorkoutScreen() {
         onCancel={() => setConfirmEnd(false)}
       />
 
-      {summary && (
-        <WorkoutSummary
-          visible
-          duration={summary.duration}
-          totalVolume={summary.totalVolume}
-          totalSets={summary.totalSets}
-          records={summary.records}
-          onClose={handleSummaryClose}
-        />
-      )}
     </SafeScreen>
   );
 }

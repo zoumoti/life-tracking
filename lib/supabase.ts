@@ -1,28 +1,26 @@
-import { createClient, SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Database } from "../types/database";
 
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL!;
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY!;
+// Hardcoded fallbacks — EXPO_PUBLIC_* vars are inlined at build time by Metro,
+// but may be undefined if the bundler didn't inject them (e.g. Android Studio builds).
+const supabaseUrl =
+  process.env.EXPO_PUBLIC_SUPABASE_URL ||
+  "https://tzyzaygqvxkazdgeyvha.supabase.co";
 
-let _supabase: SupabaseClient<Database> | null = null;
+const supabaseAnonKey =
+  process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY ||
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR6eXpheWdxdnhrYXpkZ2V5dmhhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYxMDMxMzEsImV4cCI6MjA5MTY3OTEzMX0.KsfJOK_803UP_orXzBvWSIk95rsFs9AQtvFRQigvvoA";
 
-export function getSupabase(): SupabaseClient<Database> {
-  if (!_supabase) {
-    // Lazy import to avoid SSR issues with AsyncStorage accessing window
-    const AsyncStorage = require("@react-native-async-storage/async-storage").default;
-    _supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        storage: AsyncStorage,
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: false,
-      },
-    });
-  }
-  return _supabase;
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    storage: AsyncStorage,
+    autoRefreshToken: true,
+    persistSession: true,
+    detectSessionInUrl: false,
+  },
+});
+
+export function getSupabase() {
+  return supabase;
 }
-
-// Convenience export for runtime usage
-export const supabase = typeof window !== "undefined"
-  ? getSupabase()
-  : (null as unknown as SupabaseClient<Database>);

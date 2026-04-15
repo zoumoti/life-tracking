@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import { Button } from "../ui/Button";
 import { IconPicker } from "./IconPicker";
 import { HABIT_MOMENT_LABELS, type HabitMoment } from "../../lib/constants";
@@ -36,15 +36,16 @@ const FREQUENCY_OPTIONS: { value: FrequencyType; label: string }[] = [
 ];
 
 const HABIT_COLORS = [
-  "#6C5CE7", "#a855f7", "#3b82f6", "#06b6d4",
+  "#D4AA40", "#E8C860", "#3b82f6", "#06b6d4",
   "#22c55e", "#eab308", "#f97316", "#ef4444",
 ];
 
 export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
+  const c = useColors();
   const [habitType, setHabitType] = useState<HabitType>(initial?.habit_type ?? "positive");
   const [name, setName] = useState(initial?.name ?? "");
   const [icon, setIcon] = useState(initial?.icon ?? "star");
-  const [color, setColor] = useState(initial?.color ?? "#6C5CE7");
+  const [color, setColor] = useState(initial?.color ?? "#D4AA40");
   const [frequencyType, setFrequencyType] = useState<FrequencyType>(
     initial?.frequency_type ?? "daily"
   );
@@ -79,42 +80,38 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
   return (
     <ScrollView showsVerticalScrollIndicator={false} className="flex-1">
       {/* Habit Type Toggle */}
-      <Text className="text-text-secondary text-sm mb-2">Type d'habitude</Text>
-      <View className="flex-row bg-surface rounded-button p-1 mb-4">
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Type d'habitude</Text>
+      <View className="flex-row rounded-button p-1 mb-4" style={{ backgroundColor: c.surface }}>
         <Pressable
           onPress={() => setHabitType("positive")}
-          className={`flex-1 flex-row items-center justify-center py-2 rounded-button gap-2 ${
-            habitType === "positive" ? "bg-primary" : ""
-          }`}
+          className="flex-1 flex-row items-center justify-center py-2 rounded-button gap-2"
+          style={habitType === "positive" ? { backgroundColor: c.primary } : undefined}
         >
           <Feather
             name="check-circle"
             size={16}
-            color={habitType === "positive" ? "#fff" : colors.textSecondary}
+            color={habitType === "positive" ? c.primaryOnText : c.textSecondary}
           />
           <Text
-            className={`text-sm font-semibold ${
-              habitType === "positive" ? "text-white" : "text-text-secondary"
-            }`}
+            className="text-sm font-semibold"
+            style={{ color: habitType === "positive" ? c.primaryOnText : c.textSecondary }}
           >
             Faire
           </Text>
         </Pressable>
         <Pressable
           onPress={() => setHabitType("avoid")}
-          className={`flex-1 flex-row items-center justify-center py-2 rounded-button gap-2 ${
-            habitType === "avoid" ? "bg-primary" : ""
-          }`}
+          className="flex-1 flex-row items-center justify-center py-2 rounded-button gap-2"
+          style={habitType === "avoid" ? { backgroundColor: c.primary } : undefined}
         >
           <Feather
             name="shield"
             size={16}
-            color={habitType === "avoid" ? "#fff" : colors.textSecondary}
+            color={habitType === "avoid" ? c.primaryOnText : c.textSecondary}
           />
           <Text
-            className={`text-sm font-semibold ${
-              habitType === "avoid" ? "text-white" : "text-text-secondary"
-            }`}
+            className="text-sm font-semibold"
+            style={{ color: habitType === "avoid" ? c.primaryOnText : c.textSecondary }}
           >
             Eviter
           </Text>
@@ -122,52 +119,51 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
       </View>
 
       {/* Name */}
-      <Text className="text-text-secondary text-sm mb-1">
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>
         {habitType === "positive" ? "Que veux-tu faire ?" : "Que veux-tu eviter ?"}
       </Text>
       <TextInput
         value={name}
         onChangeText={setName}
         placeholder={habitType === "positive" ? "Ex: Meditation" : "Ex: Pas de reseaux sociaux"}
-        placeholderTextColor={colors.textMuted}
-        className="bg-surface-light rounded-button px-4 py-3 text-text text-base mb-4"
+        placeholderTextColor={c.textMuted}
+        className="rounded-button px-4 py-3 text-base mb-4"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
       />
 
       {/* Icon Picker */}
       <IconPicker selected={icon} onSelect={setIcon} />
 
       {/* Color Picker */}
-      <Text className="text-text-secondary text-sm mb-2 mt-4">Couleur</Text>
+      <Text className="text-sm mb-2 mt-4" style={{ color: c.textSecondary }}>Couleur</Text>
       <View className="flex-row gap-2 mb-4">
-        {HABIT_COLORS.map((c) => (
+        {HABIT_COLORS.map((clr) => (
           <Pressable
-            key={c}
-            onPress={() => setColor(c)}
+            key={clr}
+            onPress={() => setColor(clr)}
             className={`w-8 h-8 rounded-full items-center justify-center ${
-              color === c ? "border-2 border-white" : ""
+              color === clr ? "border-2 border-white" : ""
             }`}
-            style={{ backgroundColor: c }}
+            style={{ backgroundColor: clr }}
           >
-            {color === c && <Feather name="check" size={14} color="#fff" />}
+            {color === clr && <Feather name="check" size={14} color="#fff" />}
           </Pressable>
         ))}
       </View>
 
       {/* Frequency */}
-      <Text className="text-text-secondary text-sm mb-2">Frequence</Text>
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Frequence</Text>
       <View className="flex-row gap-2 mb-3">
         {FREQUENCY_OPTIONS.map((opt) => (
           <Pressable
             key={opt.value}
             onPress={() => setFrequencyType(opt.value)}
-            className={`flex-1 py-2 rounded-button items-center ${
-              frequencyType === opt.value ? "bg-primary" : "bg-surface-light"
-            }`}
+            className="flex-1 py-2 rounded-button items-center"
+            style={{ backgroundColor: frequencyType === opt.value ? c.primary : c.surfaceLight }}
           >
             <Text
-              className={`text-xs font-semibold ${
-                frequencyType === opt.value ? "text-white" : "text-text-secondary"
-              }`}
+              className="text-xs font-semibold"
+              style={{ color: frequencyType === opt.value ? c.primaryOnText : c.textSecondary }}
             >
               {opt.label}
             </Text>
@@ -182,14 +178,12 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
             <Pressable
               key={i}
               onPress={() => toggleDay(i)}
-              className={`flex-1 py-2 rounded-lg items-center ${
-                frequencyDays.includes(i) ? "bg-primary" : "bg-surface-light"
-              }`}
+              className="flex-1 py-2 rounded-lg items-center"
+              style={{ backgroundColor: frequencyDays.includes(i) ? c.primary : c.surfaceLight }}
             >
               <Text
-                className={`text-xs font-semibold ${
-                  frequencyDays.includes(i) ? "text-white" : "text-text-secondary"
-                }`}
+                className="text-xs font-semibold"
+                style={{ color: frequencyDays.includes(i) ? c.primaryOnText : c.textSecondary }}
               >
                 {label}
               </Text>
@@ -203,37 +197,37 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
         <View className="flex-row items-center gap-3 mb-4">
           <Pressable
             onPress={() => setFrequencyValue(Math.max(1, frequencyValue - 1))}
-            className="w-8 h-8 rounded-full bg-surface-light items-center justify-center"
+            className="w-8 h-8 rounded-full items-center justify-center"
+            style={{ backgroundColor: c.surfaceLight }}
           >
-            <Feather name="minus" size={16} color={colors.text} />
+            <Feather name="minus" size={16} color={c.text} />
           </Pressable>
-          <Text className="text-text text-lg font-bold">{frequencyValue}</Text>
+          <Text className="text-lg font-bold" style={{ color: c.text }}>{frequencyValue}</Text>
           <Pressable
             onPress={() => setFrequencyValue(Math.min(7, frequencyValue + 1))}
-            className="w-8 h-8 rounded-full bg-surface-light items-center justify-center"
+            className="w-8 h-8 rounded-full items-center justify-center"
+            style={{ backgroundColor: c.surfaceLight }}
           >
-            <Feather name="plus" size={16} color={colors.text} />
+            <Feather name="plus" size={16} color={c.text} />
           </Pressable>
-          <Text className="text-text-secondary text-sm">fois par semaine</Text>
+          <Text className="text-sm" style={{ color: c.textSecondary }}>fois par semaine</Text>
         </View>
       )}
 
       {/* Time of Day */}
-      <Text className="text-text-secondary text-sm mb-2">Moment de la journee</Text>
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Moment de la journee</Text>
       <View className="flex-row gap-2 mb-6">
         {(Object.entries(HABIT_MOMENT_LABELS) as [HabitMoment, string][]).map(
           ([key, label]) => (
             <Pressable
               key={key}
               onPress={() => setTimeOfDay(key)}
-              className={`flex-1 py-2 rounded-button items-center ${
-                timeOfDay === key ? "bg-primary" : "bg-surface-light"
-              }`}
+              className="flex-1 py-2 rounded-button items-center"
+              style={{ backgroundColor: timeOfDay === key ? c.primary : c.surfaceLight }}
             >
               <Text
-                className={`text-xs font-semibold ${
-                  timeOfDay === key ? "text-white" : "text-text-secondary"
-                }`}
+                className="text-xs font-semibold"
+                style={{ color: timeOfDay === key ? c.primaryOnText : c.textSecondary }}
               >
                 {label}
               </Text>

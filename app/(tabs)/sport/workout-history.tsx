@@ -1,28 +1,38 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { View, Text, FlatList, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { SafeScreen } from "../../../components/SafeScreen";
 import { Card } from "../../../components/ui/Card";
+import { ConfirmModal } from "../../../components/ui/ConfirmModal";
 import { useWorkoutStore } from "../../../stores/workoutStore";
 import { formatDateShort, formatDuration } from "../../../lib/formatters";
-import { colors } from "../../../lib/theme";
+import { useColors } from "../../../lib/theme";
 
 export default function WorkoutHistoryScreen() {
+  const c = useColors();
   const router = useRouter();
-  const { sessions, sessionsLoading, fetchSessions } = useWorkoutStore();
+  const { sessions, sessionsLoading, fetchSessions, deleteSession } = useWorkoutStore();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSessions();
   }, []);
 
+  const handleDelete = async () => {
+    if (deleteId) {
+      await deleteSession(deleteId);
+      setDeleteId(null);
+    }
+  };
+
   return (
     <SafeScreen>
       <View className="flex-row items-center mb-4">
         <Pressable onPress={() => router.back()} className="p-2">
-          <Feather name="arrow-left" size={24} color={colors.text} />
+          <Feather name="arrow-left" size={24} color={c.text} />
         </Pressable>
-        <Text className="text-text text-xl font-bold ml-2">Historique</Text>
+        <Text style={{ color: c.text }} className="text-xl font-bold ml-2">Historique</Text>
       </View>
 
       <FlatList
@@ -41,18 +51,25 @@ export default function WorkoutHistoryScreen() {
               className="mb-3"
             >
               <View className="flex-row items-center justify-between">
-                <View>
-                  <Text className="text-text font-bold text-base">{item.name}</Text>
-                  <Text className="text-text-secondary text-sm mt-1">
+                <View className="flex-1">
+                  <Text style={{ color: c.text }} className="font-bold text-base">{item.name}</Text>
+                  <Text style={{ color: c.textSecondary }} className="text-sm mt-1">
                     {formatDateShort(item.started_at)}
                   </Text>
                 </View>
-                <View className="items-end">
-                  <Text className="text-text-secondary text-sm">{formatDuration(duration)}</Text>
-                  <Text className="text-text-muted text-xs mt-1">
+                <View className="items-end mr-3">
+                  <Text style={{ color: c.textSecondary }} className="text-sm">{formatDuration(duration)}</Text>
+                  <Text style={{ color: c.textMuted }} className="text-xs mt-1">
                     {Math.round(totalVolume)} kg · {totalSets} series
                   </Text>
                 </View>
+                <Pressable
+                  onPress={() => setDeleteId(item.id)}
+                  className="p-2 active:opacity-60"
+                  hitSlop={8}
+                >
+                  <Feather name="trash-2" size={18} color={c.textMuted} />
+                </Pressable>
               </View>
             </Card>
           );
@@ -60,12 +77,21 @@ export default function WorkoutHistoryScreen() {
         ListEmptyComponent={
           !sessionsLoading ? (
             <View className="items-center mt-12">
-              <Feather name="calendar" size={48} color={colors.textMuted} />
-              <Text className="text-text-secondary mt-4">Aucune seance</Text>
+              <Feather name="calendar" size={48} color={c.textMuted} />
+              <Text style={{ color: c.textSecondary }} className="mt-4">Aucune seance</Text>
             </View>
           ) : null
         }
         showsVerticalScrollIndicator={false}
+      />
+
+      <ConfirmModal
+        visible={!!deleteId}
+        title="Supprimer cette seance ?"
+        message="L'historique des series sera perdu. Cette action est irreversible."
+        confirmLabel="Supprimer"
+        onConfirm={handleDelete}
+        onCancel={() => setDeleteId(null)}
       />
     </SafeScreen>
   );

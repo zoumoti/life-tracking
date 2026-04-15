@@ -48,7 +48,17 @@ export const useHabitStore = createPersistedStore<HabitState>(
           .order("sort_order", { ascending: true });
 
         if (!error && data) {
-          set({ habits: data, lastSyncedAt: new Date().toISOString() });
+          // Migrate old purple colors to gold
+          const OLD_COLORS = ["#6C5CE7", "#a855f7"];
+          const NEW_COLOR = "#D4AA40";
+          const migrated = data.map((h) => {
+            if (h.color && OLD_COLORS.includes(h.color)) {
+              supabase.from("habits").update({ color: NEW_COLOR }).eq("id", h.id);
+              return { ...h, color: NEW_COLOR };
+            }
+            return h;
+          });
+          set({ habits: migrated, lastSyncedAt: new Date().toISOString() });
         }
       } finally {
         set({ loading: false });

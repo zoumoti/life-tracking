@@ -1,6 +1,9 @@
-import { View, Text } from "react-native";
+import { View, Text, Pressable } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { toDateString, isoDayOfWeek, parseDate, MONTH_LABELS, addDays } from "../../lib/dateUtils";
 import { isHabitScheduledForDate } from "../../lib/habitUtils";
+import { useColors } from "../../lib/theme";
+import { useThemeStore } from "../../stores/themeStore";
 import type { Tables } from "../../types/database";
 
 const DAY_NAMES = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
@@ -41,6 +44,8 @@ function getMotivationalMessage(habits: Tables<"habits">[], completions: Record<
 }
 
 export function HomeHeader({ habits, completions }: Props) {
+  const c = useColors();
+  const { mode, toggleTheme } = useThemeStore();
   const today = toDateString();
   const date = parseDate(today);
   const dayName = DAY_NAMES[isoDayOfWeek(date)];
@@ -51,11 +56,26 @@ export function HomeHeader({ habits, completions }: Props) {
 
   return (
     <View className="mb-4 mt-2">
-      <Text className="text-text-secondary text-sm">
-        {dayName} {dayNum} {monthName}
-      </Text>
-      <Text className="text-text text-2xl font-bold mt-1">Aujourd'hui</Text>
-      <Text className="text-primary text-sm mt-1">{message}</Text>
+      <View className="flex-row items-center justify-between">
+        <View>
+          <Text className="text-sm" style={{ color: c.textSecondary }}>
+            {dayName} {dayNum} {monthName}
+          </Text>
+          <Text className="text-2xl font-bold mt-1" style={{ color: c.text }}>Aujourd'hui</Text>
+        </View>
+        <Pressable
+          onPress={toggleTheme}
+          className="w-10 h-10 rounded-full items-center justify-center active:opacity-70"
+          style={{ backgroundColor: c.surfaceLight }}
+        >
+          <Feather
+            name={mode === "dark" ? "sun" : "moon"}
+            size={20}
+            color={c.primary}
+          />
+        </Pressable>
+      </View>
+      <Text className="text-sm mt-1" style={{ color: c.primary }}>{message}</Text>
     </View>
   );
 }

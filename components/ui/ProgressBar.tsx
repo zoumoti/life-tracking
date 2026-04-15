@@ -1,5 +1,5 @@
 import { View } from "react-native";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   progress: number; // 0 to 1
@@ -10,22 +10,23 @@ type Props = {
 
 export function ProgressBar({
   progress,
-  color = colors.primary,
+  color,
   height = 6,
   className = "",
 }: Props) {
+  const c = useColors();
   const clamped = Math.min(Math.max(progress, 0), 1);
 
   return (
     <View
       className={`w-full rounded-full overflow-hidden ${className}`}
-      style={{ height, backgroundColor: colors.surfaceLight }}
+      style={{ height, backgroundColor: c.surfaceLight }}
     >
       <View
         style={{
           width: `${clamped * 100}%`,
           height,
-          backgroundColor: color,
+          backgroundColor: color || c.primary,
           borderRadius: 9999,
         }}
       />

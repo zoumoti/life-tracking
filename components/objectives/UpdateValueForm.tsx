@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { View, Text, TextInput } from "react-native";
 import { Button } from "../ui/Button";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export function UpdateValueForm({ objective, onSubmit, onCancel, loading }: Props) {
+  const c = useColors();
   const [value, setValue] = useState(String(objective.current_value));
   const [note, setNote] = useState("");
 
@@ -23,27 +24,29 @@ export function UpdateValueForm({ objective, onSubmit, onCancel, loading }: Prop
 
   return (
     <View>
-      <Text className="text-text text-base font-bold mb-1">{objective.title}</Text>
-      <Text className="text-text-muted text-sm mb-4">
+      <Text className="text-base font-bold mb-1" style={{ color: c.text }}>{objective.title}</Text>
+      <Text className="text-sm mb-4" style={{ color: c.textMuted }}>
         Actuel : {objective.current_value} {objective.unit} → Cible : {objective.target_value} {objective.unit}
       </Text>
 
-      <Text className="text-text-secondary text-sm mb-1">Nouvelle valeur</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Nouvelle valeur</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-4 text-base"
+        className="rounded-button px-4 py-3 mb-4 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder={String(objective.current_value)}
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={value}
         onChangeText={setValue}
         keyboardType="numeric"
         autoFocus
       />
 
-      <Text className="text-text-secondary text-sm mb-1">Note (optionnel)</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Note (optionnel)</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-6 text-base"
+        className="rounded-button px-4 py-3 mb-6 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="Observations, contexte..."
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={note}
         onChangeText={setNote}
         multiline

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { View, Text, ScrollView, Pressable, ActivityIndicator } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import GorhomBottomSheet from "@gorhom/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { SafeScreen } from "../../components/SafeScreen";
 import { BottomSheet } from "../../components/ui/BottomSheet";
 import { Button } from "../../components/ui/Button";
@@ -13,7 +13,7 @@ import { ObjectiveDetail } from "../../components/objectives/ObjectiveDetail";
 import { UpdateValueForm } from "../../components/objectives/UpdateValueForm";
 import { useVisionStore } from "../../stores/visionStore";
 import { useObjectiveStore } from "../../stores/objectiveStore";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type SheetMode =
@@ -31,10 +31,11 @@ type ConfirmAction =
   | { type: "deleteObjective"; objective: Tables<"objectives"> };
 
 export default function ObjectivesScreen() {
+  const c = useColors();
   const { visions, loading: visionsLoading, fetchVisions, addVision, updateVision, deleteVision } = useVisionStore();
   const { objectives, loading: objectivesLoading, fetchObjectives, addObjective, updateObjective, deleteObjective, logUpdate, getObjectivesByVision } = useObjectiveStore();
 
-  const sheetRef = useRef<GorhomBottomSheet>(null);
+  const sheetRef = useRef<BottomSheetModal>(null);
   const [sheetMode, setSheetMode] = useState<SheetMode>({ type: "none" });
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>({ type: "none" });
   const [formLoading, setFormLoading] = useState(false);
@@ -47,11 +48,11 @@ export default function ObjectivesScreen() {
   // --- Sheet helpers ---
   const openSheet = useCallback((mode: SheetMode) => {
     setSheetMode(mode);
-    setTimeout(() => sheetRef.current?.snapToIndex(0), 50);
+    setTimeout(() => sheetRef.current?.present(), 50);
   }, []);
 
   const closeSheet = useCallback(() => {
-    sheetRef.current?.close();
+    sheetRef.current?.dismiss();
     setSheetMode({ type: "none" });
   }, []);
 
@@ -210,32 +211,33 @@ export default function ObjectivesScreen() {
     }
   })();
 
-  const snapPoints = sheetMode.type === "detail" ? ["85%"] : ["70%", "90%"];
+  const snapPoints = sheetMode.type === "detail" ? ["85%"] : ["85%", "95%"];
 
   return (
     <SafeScreen>
       {/* Header */}
       <View className="flex-row items-center justify-between mb-4 mt-2">
-        <Text className="text-text text-2xl font-bold">Objectifs</Text>
+        <Text style={{ color: c.text }} className="text-2xl font-bold">Objectifs</Text>
         <Pressable
           onPress={() => openSheet({ type: "addVision" })}
-          className="flex-row items-center bg-primary px-3 py-2 rounded-button active:opacity-80"
+          className="flex-row items-center px-3 py-2 rounded-button active:opacity-80"
+          style={{ backgroundColor: c.primary }}
         >
-          <Feather name="plus" size={16} color="#fff" />
-          <Text className="text-white text-sm font-semibold ml-1">Vision</Text>
+          <Feather name="plus" size={16} color="#1a1608" />
+          <Text style={{ color: c.primaryOnText }} className="text-sm font-semibold ml-1">Vision</Text>
         </Pressable>
       </View>
 
       {/* Content */}
       {loading && visions.length === 0 ? (
         <View className="flex-1 items-center justify-center">
-          <ActivityIndicator size="large" color={colors.primary} />
+          <ActivityIndicator size="large" color={c.primary} />
         </View>
       ) : visions.length === 0 ? (
         <View className="flex-1 items-center justify-center px-8">
-          <Feather name="target" size={48} color={colors.textMuted} />
-          <Text className="text-text text-lg font-bold mt-4 mb-2">Aucune vision</Text>
-          <Text className="text-text-secondary text-sm text-center mb-6">
+          <Feather name="target" size={48} color={c.textMuted} />
+          <Text style={{ color: c.text }} className="text-lg font-bold mt-4 mb-2">Aucune vision</Text>
+          <Text style={{ color: c.textSecondary }} className="text-sm text-center mb-6">
             Commence par creer une vision — une grande direction de vie — puis ajoute des objectifs mesurables.
           </Text>
           <Button title="Creer ma premiere vision" onPress={() => openSheet({ type: "addVision" })} />

@@ -1,4 +1,5 @@
 import { Pressable, Text, ActivityIndicator } from "react-native";
+import { useColors } from "../../lib/theme";
 
 type ButtonVariant = "primary" | "secondary" | "destructive";
 
@@ -11,21 +12,6 @@ type Props = {
   className?: string;
 };
 
-const variantStyles: Record<ButtonVariant, { container: string; text: string }> = {
-  primary: {
-    container: "bg-primary",
-    text: "text-white",
-  },
-  secondary: {
-    container: "bg-surface",
-    text: "text-primary",
-  },
-  destructive: {
-    container: "bg-danger",
-    text: "text-white",
-  },
-};
-
 export function Button({
   title,
   onPress,
@@ -34,20 +20,29 @@ export function Button({
   loading = false,
   className = "",
 }: Props) {
-  const styles = variantStyles[variant];
+  const c = useColors();
+
+  const styles = {
+    primary: { bg: c.primary, text: c.primaryOnText },
+    secondary: { bg: c.surface, text: c.primary },
+    destructive: { bg: c.danger, text: "#ffffff" },
+  }[variant];
 
   return (
     <Pressable
       onPress={onPress}
       disabled={disabled || loading}
-      className={`py-3 px-6 rounded-button items-center justify-center ${styles.container} ${
+      className={`py-3 px-6 rounded-button items-center justify-center ${
         disabled ? "opacity-50" : "active:opacity-80"
       } ${className}`}
+      style={{ backgroundColor: styles.bg }}
     >
       {loading ? (
-        <ActivityIndicator color="#fff" size="small" />
+        <ActivityIndicator color={styles.text} size="small" />
       ) : (
-        <Text className={`text-base font-semibold ${styles.text}`}>{title}</Text>
+        <Text className="text-base font-semibold" style={{ color: styles.text }}>
+          {title}
+        </Text>
       )}
     </Pressable>
   );

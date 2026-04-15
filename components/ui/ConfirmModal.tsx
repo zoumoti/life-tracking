@@ -1,4 +1,5 @@
 import { Modal, View, Text, Pressable } from "react-native";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   visible: boolean;
@@ -21,31 +22,35 @@ export function ConfirmModal({
   onConfirm,
   onCancel,
 }: Props) {
+  const c = useColors();
+
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={onCancel}>
       <Pressable
         className="flex-1 bg-black/60 items-center justify-center px-8"
         onPress={onCancel}
       >
-        <Pressable className="bg-surface w-full rounded-card p-6" onPress={() => {}}>
-          <Text className="text-text text-lg font-bold mb-2">{title}</Text>
-          <Text className="text-text-secondary text-sm mb-6">{message}</Text>
+        <Pressable className="w-full rounded-card p-6" style={{ backgroundColor: c.surface }} onPress={() => {}}>
+          <Text className="text-lg font-bold mb-2" style={{ color: c.text }}>{title}</Text>
+          <Text className="text-sm mb-6" style={{ color: c.textSecondary }}>{message}</Text>
 
           <View className="flex-row gap-3">
             <Pressable
-              className="flex-1 bg-surface-light py-3 rounded-button items-center active:opacity-80"
+              className="flex-1 py-3 rounded-button items-center active:opacity-80"
+              style={{ backgroundColor: c.surfaceLight }}
               onPress={onCancel}
             >
-              <Text className="text-text font-semibold">{cancelLabel}</Text>
+              <Text className="font-semibold" style={{ color: c.text }}>{cancelLabel}</Text>
             </Pressable>
 
             <Pressable
-              className={`flex-1 py-3 rounded-button items-center active:opacity-80 ${
-                destructive ? "bg-danger" : "bg-primary"
-              }`}
+              className="flex-1 py-3 rounded-button items-center active:opacity-80"
+              style={{ backgroundColor: destructive ? c.danger : c.primary }}
               onPress={onConfirm}
             >
-              <Text className="text-white font-semibold">{confirmLabel}</Text>
+              <Text className="font-semibold" style={{ color: destructive ? "#ffffff" : c.primaryOnText }}>
+                {confirmLabel}
+              </Text>
             </Pressable>
           </View>
         </Pressable>

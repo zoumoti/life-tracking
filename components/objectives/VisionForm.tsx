@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
+import { Feather } from "@expo/vector-icons";
 import { Button } from "../ui/Button";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 const VISION_COLORS = [
-  "#6C5CE7", "#a855f7", "#22c55e", "#f59e0b",
+  "#D4AA40", "#E8C860", "#22c55e", "#f59e0b",
   "#ef4444", "#3b82f6", "#ec4899", "#14b8a6",
 ];
 
@@ -22,10 +23,11 @@ type Props = {
 };
 
 export function VisionForm({ initial, onSubmit, onCancel, loading }: Props) {
+  const c = useColors();
   const [title, setTitle] = useState(initial?.title ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [icon, setIcon] = useState(initial?.icon ?? "target");
-  const [color, setColor] = useState(initial?.color ?? "#6C5CE7");
+  const [color, setColor] = useState(initial?.color ?? "#D4AA40");
 
   const handleSubmit = () => {
     if (!title.trim()) return;
@@ -35,21 +37,23 @@ export function VisionForm({ initial, onSubmit, onCancel, loading }: Props) {
   return (
     <ScrollView className="flex-1" keyboardShouldPersistTaps="handled">
       {/* Title */}
-      <Text className="text-text-secondary text-sm mb-1">Nom de la vision</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Nom de la vision</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-4 text-base"
+        className="rounded-button px-4 py-3 mb-4 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="Ex: Etre en excellente forme"
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={title}
         onChangeText={setTitle}
       />
 
       {/* Description */}
-      <Text className="text-text-secondary text-sm mb-1">Description (optionnel)</Text>
+      <Text className="text-sm mb-1" style={{ color: c.textSecondary }}>Description (optionnel)</Text>
       <TextInput
-        className="bg-surface-light text-text rounded-button px-4 py-3 mb-4 text-base"
+        className="rounded-button px-4 py-3 mb-4 text-base"
+        style={{ backgroundColor: c.surfaceLight, color: c.text }}
         placeholder="Ce que cette vision represente..."
-        placeholderTextColor={colors.textMuted}
+        placeholderTextColor={c.textMuted}
         value={description}
         onChangeText={setDescription}
         multiline
@@ -57,27 +61,27 @@ export function VisionForm({ initial, onSubmit, onCancel, loading }: Props) {
       />
 
       {/* Color picker */}
-      <Text className="text-text-secondary text-sm mb-2">Couleur</Text>
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Couleur</Text>
       <View className="flex-row flex-wrap gap-3 mb-4">
-        {VISION_COLORS.map((c) => (
+        {VISION_COLORS.map((vc) => (
           <Pressable
-            key={c}
-            onPress={() => setColor(c)}
+            key={vc}
+            onPress={() => setColor(vc)}
             className="items-center justify-center"
             style={{
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: c,
-              borderWidth: color === c ? 3 : 0,
-              borderColor: colors.text,
+              backgroundColor: vc,
+              borderWidth: color === vc ? 3 : 0,
+              borderColor: c.text,
             }}
           />
         ))}
       </View>
 
       {/* Icon picker */}
-      <Text className="text-text-secondary text-sm mb-2">Icone</Text>
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Icone</Text>
       <View className="flex-row flex-wrap gap-3 mb-6">
         {VISION_ICONS.map((i) => (
           <Pressable
@@ -88,10 +92,10 @@ export function VisionForm({ initial, onSubmit, onCancel, loading }: Props) {
               width: 44,
               height: 44,
               borderRadius: 12,
-              backgroundColor: icon === i ? colors.primary : colors.surfaceLight,
+              backgroundColor: icon === i ? c.primary : c.surfaceLight,
             }}
           >
-            <Text className="text-text text-sm">{i}</Text>
+            <Feather name={i as any} size={20} color={icon === i ? c.primaryOnText : c.textSecondary} />
           </Pressable>
         ))}
       </View>

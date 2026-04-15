@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import { DAY_LABELS } from "../../lib/dateUtils";
 
 type Props = {
@@ -13,19 +13,21 @@ type Props = {
 };
 
 function StatBox({ icon, label, value, iconColor }: { icon: string; label: string; value: string; iconColor?: string }) {
+  const c = useColors();
   return (
-    <View className="flex-1 bg-surface rounded-card p-3 items-center">
-      <Feather name={icon as any} size={18} color={iconColor || colors.primary} />
-      <Text className="text-text text-lg font-bold mt-1">{value}</Text>
-      <Text className="text-text-muted text-xs mt-1">{label}</Text>
+    <View className="flex-1 rounded-card p-3 items-center" style={{ backgroundColor: c.surface }}>
+      <Feather name={icon as any} size={18} color={iconColor || c.primary} />
+      <Text className="text-lg font-bold mt-1" style={{ color: c.text }}>{value}</Text>
+      <Text className="text-xs mt-1" style={{ color: c.textMuted }}>{label}</Text>
     </View>
   );
 }
 
 export function HabitStats({ currentStreak, bestStreak, completionRate, bestDay, worstDay, isAvoid }: Props) {
+  const c = useColors();
   const streakLabel = isAvoid ? "Jours sans" : "Streak actuel";
   const bestLabel = isAvoid ? "Record sans" : "Meilleur streak";
-  const accentColor = isAvoid ? colors.success : colors.primary;
+  const accentColor = isAvoid ? c.success : c.primary;
 
   return (
     <View>

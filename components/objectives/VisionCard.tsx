@@ -2,7 +2,7 @@ import { View, Text, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "../ui/Card";
 import { ObjectiveRow } from "./ObjectiveRow";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type Props = {
@@ -22,6 +22,8 @@ export function VisionCard({
   onEditVision,
   onDeleteVision,
 }: Props) {
+  const c = useColors();
+
   return (
     <Card className="mb-4">
       {/* Vision header */}
@@ -43,11 +45,11 @@ export function VisionCard({
             />
           </View>
           <View className="flex-1">
-            <Text className="text-text text-base font-bold" numberOfLines={1}>
+            <Text className="text-base font-bold" style={{ color: c.text }} numberOfLines={1}>
               {vision.title}
             </Text>
             {vision.description ? (
-              <Text className="text-text-muted text-xs" numberOfLines={1}>
+              <Text className="text-xs" style={{ color: c.textMuted }} numberOfLines={1}>
                 {vision.description}
               </Text>
             ) : null}
@@ -56,17 +58,17 @@ export function VisionCard({
 
         <View className="flex-row gap-1">
           <Pressable onPress={onEditVision} className="p-2 active:opacity-60">
-            <Feather name="edit-2" size={16} color={colors.textMuted} />
+            <Feather name="edit-2" size={16} color={c.textMuted} />
           </Pressable>
           <Pressable onPress={onDeleteVision} className="p-2 active:opacity-60">
-            <Feather name="trash-2" size={16} color={colors.textMuted} />
+            <Feather name="trash-2" size={16} color={c.textMuted} />
           </Pressable>
         </View>
       </View>
 
       {/* Objectives list */}
       {objectives.length === 0 ? (
-        <Text className="text-text-muted text-sm py-2">Aucun objectif pour le moment</Text>
+        <Text className="text-sm py-2" style={{ color: c.textMuted }}>Aucun objectif pour le moment</Text>
       ) : (
         objectives.map((obj) => (
           <ObjectiveRow
@@ -81,11 +83,11 @@ export function VisionCard({
       {/* Add objective button */}
       <Pressable
         onPress={onAddObjective}
-        className="flex-row items-center justify-center py-2 mt-2 rounded-button active:opacity-60"
+        className="flex-row items-center justify-center py-3 mt-2 rounded-button active:opacity-60"
         style={{ backgroundColor: vision.color + "15" }}
       >
-        <Feather name="plus" size={16} color={vision.color} />
-        <Text className="text-sm font-medium ml-1" style={{ color: vision.color }}>
+        <Feather name="plus" size={14} color={vision.color} />
+        <Text className="text-sm font-medium ml-2" style={{ color: vision.color }} numberOfLines={1}>
           Ajouter un objectif
         </Text>
       </Pressable>

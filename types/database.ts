@@ -564,6 +564,48 @@ export interface Database {
         };
         Relationships: [];
       };
+      tasks: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          notes: string | null;
+          due_date: string | null;
+          priority: "high" | "normal" | "low";
+          completed: boolean;
+          completed_at: string | null;
+          google_task_id: string | null;
+          google_event_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          notes?: string | null;
+          due_date?: string | null;
+          priority?: "high" | "normal" | "low";
+          completed?: boolean;
+          completed_at?: string | null;
+          google_task_id?: string | null;
+          google_event_id?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          notes?: string | null;
+          due_date?: string | null;
+          priority?: "high" | "normal" | "low";
+          completed?: boolean;
+          completed_at?: string | null;
+          google_task_id?: string | null;
+          google_event_id?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: {
       [_ in never]: never;

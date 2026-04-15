@@ -5,18 +5,20 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        background: "#111118",
-        surface: "#1a1a2e",
-        "surface-light": "#2d2d44",
-        primary: "#6C5CE7",
-        "primary-light": "#a855f7",
+        background: "#121210",
+        surface: "#1c1a16",
+        "surface-light": "#2e2b24",
+        primary: "#D4AA40",
+        "primary-light": "#E8C860",
+        "primary-dark": "#B8922E",
+        "primary-on": "#1a1608",
         success: "#22c55e",
         warning: "#f59e0b",
         danger: "#ef4444",
         text: {
           DEFAULT: "#ffffff",
-          secondary: "#888899",
-          muted: "#555566",
+          secondary: "#9a9590",
+          muted: "#5e5a54",
         },
       },
       borderRadius: {

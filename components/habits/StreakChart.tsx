@@ -2,7 +2,7 @@ import { View, Text } from "react-native";
 import Svg, { Polyline, Circle, Line } from "react-native-svg";
 import { addDays, toDateString } from "../../lib/dateUtils";
 import { isHabitScheduledForDate } from "../../lib/habitUtils";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type Props = {
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export function StreakChart({ habit, completedDates, days = 30 }: Props) {
+  const c = useColors();
   const today = toDateString();
   const width = 300;
   const height = 120;
@@ -61,7 +62,7 @@ export function StreakChart({ habit, completedDates, days = 30 }: Props) {
 
   return (
     <View>
-      <Text className="text-text-secondary text-sm mb-2">Streak (30 jours)</Text>
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Streak (30 jours)</Text>
       <Svg width={width} height={height} viewBox={`0 0 ${width} ${height}`}>
         {/* Baseline */}
         <Line
@@ -69,7 +70,7 @@ export function StreakChart({ habit, completedDates, days = 30 }: Props) {
           y1={padding.top + chartH}
           x2={padding.left + chartW}
           y2={padding.top + chartH}
-          stroke={colors.surface}
+          stroke={c.surface}
           strokeWidth={1}
         />
         {/* Streak line */}
@@ -77,7 +78,7 @@ export function StreakChart({ habit, completedDates, days = 30 }: Props) {
           <Polyline
             points={polylinePoints}
             fill="none"
-            stroke={colors.primary}
+            stroke={c.primary}
             strokeWidth={2}
             strokeLinejoin="round"
           />
@@ -88,7 +89,7 @@ export function StreakChart({ habit, completedDates, days = 30 }: Props) {
             cx={normalizedPoints[normalizedPoints.length - 1].x}
             cy={normalizedPoints[normalizedPoints.length - 1].y}
             r={4}
-            fill={colors.primary}
+            fill={c.primary}
           />
         )}
       </Svg>

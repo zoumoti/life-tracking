@@ -8,7 +8,7 @@ import {
   parseDate,
 } from "../../lib/dateUtils";
 import { isHabitScheduledForDate } from "../../lib/habitUtils";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import type { Tables } from "../../types/database";
 
 type Props = {
@@ -20,6 +20,7 @@ type Props = {
 };
 
 export function MonthView({ habits, completions, year, month, onChangeMonth }: Props) {
+  const c = useColors();
   const grid = getMonthGrid(year, month);
   const todayStr = toDateString();
 
@@ -33,10 +34,10 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
   }
 
   function intensityColor(intensity: number): string {
-    if (intensity === 0) return colors.surface;
-    if (intensity < 0.34) return colors.primary + "30";
-    if (intensity < 0.67) return colors.primary + "70";
-    return colors.primary;
+    if (intensity === 0) return c.surface;
+    if (intensity < 0.34) return c.primary + "30";
+    if (intensity < 0.67) return c.primary + "70";
+    return c.primary;
   }
 
   return (
@@ -44,13 +45,13 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
       {/* Month navigation */}
       <View className="flex-row items-center justify-between mb-4 px-2">
         <Pressable onPress={() => onChangeMonth(-1)} hitSlop={12}>
-          <Feather name="chevron-left" size={22} color={colors.text} />
+          <Feather name="chevron-left" size={22} color={c.text} />
         </Pressable>
-        <Text className="text-text text-lg font-bold">
+        <Text className="text-lg font-bold" style={{ color: c.text }}>
           {MONTH_LABELS[month]} {year}
         </Text>
         <Pressable onPress={() => onChangeMonth(1)} hitSlop={12}>
-          <Feather name="chevron-right" size={22} color={colors.text} />
+          <Feather name="chevron-right" size={22} color={c.text} />
         </Pressable>
       </View>
 
@@ -58,7 +59,7 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
       <View className="flex-row mb-1 px-1">
         {DAY_LABELS_SHORT.map((label, i) => (
           <View key={i} className="flex-1 items-center">
-            <Text className="text-text-muted text-xs">{label}</Text>
+            <Text className="text-xs" style={{ color: c.textMuted }}>{label}</Text>
           </View>
         ))}
       </View>
@@ -77,23 +78,19 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
             return (
               <View key={dateStr} className="flex-1 items-center py-1">
                 <View
-                  className={`w-8 h-8 rounded-lg items-center justify-center ${
-                    isT ? "border border-primary" : ""
-                  }`}
-                  style={{
-                    backgroundColor: isCurrentMonth
-                      ? intensityColor(intensity)
-                      : "transparent",
-                  }}
+                  className="w-8 h-8 rounded-lg items-center justify-center"
+                  style={[
+                    {
+                      backgroundColor: isCurrentMonth
+                        ? intensityColor(intensity)
+                        : "transparent",
+                    },
+                    isT ? { borderWidth: 1, borderColor: c.primary } : undefined,
+                  ]}
                 >
                   <Text
-                    className={`text-xs ${
-                      !isCurrentMonth
-                        ? "text-text-muted opacity-30"
-                        : isT
-                        ? "text-primary font-bold"
-                        : "text-text"
-                    }`}
+                    className={`text-xs ${!isCurrentMonth ? "opacity-30" : ""} ${isT ? "font-bold" : ""}`}
+                    style={{ color: !isCurrentMonth ? c.textMuted : isT ? c.primary : c.text }}
                   >
                     {dateObj.getDate()}
                   </Text>
@@ -107,20 +104,20 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
       {/* Legend */}
       <View className="flex-row items-center justify-center gap-3 mt-3">
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.surface }} />
-          <Text className="text-text-muted text-xs">0%</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: c.surface }} />
+          <Text className="text-xs" style={{ color: c.textMuted }}>0%</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.primary + "30" }} />
-          <Text className="text-text-muted text-xs">&lt;34%</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: c.primary + "30" }} />
+          <Text className="text-xs" style={{ color: c.textMuted }}>&lt;34%</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.primary + "70" }} />
-          <Text className="text-text-muted text-xs">&lt;67%</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: c.primary + "70" }} />
+          <Text className="text-xs" style={{ color: c.textMuted }}>&lt;67%</Text>
         </View>
         <View className="flex-row items-center gap-1">
-          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: colors.primary }} />
-          <Text className="text-text-muted text-xs">100%</Text>
+          <View className="w-3 h-3 rounded-sm" style={{ backgroundColor: c.primary }} />
+          <Text className="text-xs" style={{ color: c.textMuted }}>100%</Text>
         </View>
       </View>
     </View>

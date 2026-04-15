@@ -10,9 +10,10 @@ import { MonthView } from "../../components/habits/MonthView";
 import { useHabitStore } from "../../stores/habitStore";
 import { toDateString, addDays, MONTH_LABELS } from "../../lib/dateUtils";
 import { calculateStreak, habitStats } from "../../lib/habitUtils";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 export default function HabitDetailScreen() {
+  const c = useColors();
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { habits, completions, deleteHabit, getCompletedDatesForHabit, fetchCompletions } =
@@ -70,8 +71,8 @@ export default function HabitDetailScreen() {
 
   if (!habit) {
     return (
-      <View className="flex-1 bg-background items-center justify-center">
-        <Text className="text-text-secondary">Habitude introuvable</Text>
+      <View className="flex-1 items-center justify-center" style={{ backgroundColor: c.background }}>
+        <Text style={{ color: c.textSecondary }}>Habitude introuvable</Text>
       </View>
     );
   }
@@ -81,37 +82,37 @@ export default function HabitDetailScreen() {
       <Stack.Screen
         options={{
           title: habit.name,
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
+          headerStyle: { backgroundColor: c.background },
+          headerTintColor: c.text,
           headerShadowVisible: false,
         }}
       />
-      <ScrollView className="flex-1 bg-background px-4 pt-4">
+      <ScrollView className="flex-1 px-4 pt-4" style={{ backgroundColor: c.background }}>
         {/* Header */}
         <View className="flex-row items-center mb-6">
           <View
             className="w-12 h-12 rounded-xl items-center justify-center mr-4"
-            style={{ backgroundColor: (habit.color || colors.primary) + "20" }}
+            style={{ backgroundColor: (habit.color || c.primary) + "20" }}
           >
             <Feather
               name={(habit.icon as any) || "circle"}
               size={24}
-              color={habit.color || colors.primary}
+              color={habit.color || c.primary}
             />
           </View>
           <View className="flex-1">
             <View className="flex-row items-center gap-2">
-              <Text className="text-text text-xl font-bold">{habit.name}</Text>
+              <Text className="text-xl font-bold" style={{ color: c.text }}>{habit.name}</Text>
               {habit.habit_type === "avoid" && (
-                <View className="bg-surface-light px-2 py-0.5 rounded-full">
-                  <Text className="text-text-secondary text-xs">Eviter</Text>
+                <View className="px-2 py-0.5 rounded-full" style={{ backgroundColor: c.surfaceLight }}>
+                  <Text className="text-xs" style={{ color: c.textSecondary }}>Eviter</Text>
                 </View>
               )}
             </View>
             {streak.warning && (
               <View className="flex-row items-center mt-1">
-                <Feather name="alert-triangle" size={14} color={colors.warning} />
-                <Text className="text-xs ml-1" style={{ color: colors.warning }}>
+                <Feather name="alert-triangle" size={14} color={c.warning} />
+                <Text className="text-xs ml-1" style={{ color: c.warning }}>
                   {habit.habit_type === "avoid"
                     ? "Attention ! Un ecart de plus et le compteur tombe"
                     : "Attention ! Un jour de plus et le streak tombe"}
@@ -138,7 +139,7 @@ export default function HabitDetailScreen() {
 
         {/* Calendar History */}
         <Card className="mt-4 mb-4">
-          <Text className="text-text font-bold text-base mb-3">Historique</Text>
+          <Text className="font-bold text-base mb-3" style={{ color: c.text }}>Historique</Text>
           <MonthView
             habits={[habit]}
             completions={completions}
@@ -153,8 +154,8 @@ export default function HabitDetailScreen() {
           onPress={() => setShowDelete(true)}
           className="flex-row items-center justify-center py-4 mb-8"
         >
-          <Feather name="trash-2" size={18} color={colors.danger} />
-          <Text className="ml-2 font-semibold" style={{ color: colors.danger }}>
+          <Feather name="trash-2" size={18} color={c.danger} />
+          <Text className="ml-2 font-semibold" style={{ color: c.danger }}>
             Supprimer cette habitude
           </Text>
         </Pressable>

@@ -1,18 +1,21 @@
 import { forwardRef, useCallback, useMemo } from "react";
-import { View, Text, Pressable } from "react-native";
-import GorhomBottomSheet, { BottomSheetBackdrop, BottomSheetView } from "@gorhom/bottom-sheet";
+import { View, Text } from "react-native";
+import { BottomSheetModal, BottomSheetBackdrop, BottomSheetScrollView } from "@gorhom/bottom-sheet";
 import type { BottomSheetBackdropProps } from "@gorhom/bottom-sheet";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   title?: string;
   children: React.ReactNode;
   snapPoints?: string[];
   onClose?: () => void;
+  /** Set to false when children contain their own scrollable (FlatList, SectionList, etc.) */
+  scrollable?: boolean;
 };
 
-export const BottomSheet = forwardRef<GorhomBottomSheet, Props>(
-  ({ title, children, snapPoints: customSnapPoints, onClose }, ref) => {
+export const BottomSheet = forwardRef<BottomSheetModal, Props>(
+  ({ title, children, snapPoints: customSnapPoints, onClose, scrollable = true }, ref) => {
+    const c = useColors();
     const snapPoints = useMemo(() => customSnapPoints ?? ["50%", "80%"], [customSnapPoints]);
 
     const renderBackdrop = useCallback(
@@ -22,22 +25,41 @@ export const BottomSheet = forwardRef<GorhomBottomSheet, Props>(
       []
     );
 
+    const titleEl = title ? (
+      <Text className="text-lg font-bold mb-4" style={{ color: c.text }}>{title}</Text>
+    ) : null;
+
     return (
-      <GorhomBottomSheet
+      <BottomSheetModal
         ref={ref}
-        index={-1}
         snapPoints={snapPoints}
         enablePanDownToClose
-        onClose={onClose}
+        enableDynamicSizing={false}
+        onDismiss={onClose}
         backdropComponent={renderBackdrop}
-        backgroundStyle={{ backgroundColor: colors.surface }}
-        handleIndicatorStyle={{ backgroundColor: colors.textMuted }}
+        backgroundStyle={{ backgroundColor: c.surface }}
+        handleIndicatorStyle={{ backgroundColor: c.textMuted }}
+        keyboardBehavior="interactive"
+        keyboardBlurBehavior="restore"
+        android_keyboardInputMode="adjustResize"
       >
-        <BottomSheetView className="flex-1 px-4 pb-4">
-          {title && <Text className="text-text text-lg font-bold mb-4">{title}</Text>}
-          {children}
-        </BottomSheetView>
-      </GorhomBottomSheet>
+        {scrollable ? (
+          <BottomSheetScrollView
+            contentContainerStyle={{
+              paddingHorizontal: 16,
+              paddingBottom: 40,
+            }}
+          >
+            {titleEl}
+            {children}
+          </BottomSheetScrollView>
+        ) : (
+          <View style={{ flex: 1, paddingHorizontal: 16 }}>
+            {titleEl}
+            {children}
+          </View>
+        )}
+      </BottomSheetModal>
     );
   }
 );

@@ -31,7 +31,17 @@ export const useVisionStore = createPersistedStore<VisionState>(
         .order("sort_order", { ascending: true });
 
       if (!error && data) {
-        set({ visions: data, loading: false });
+        // Migrate old purple colors to gold
+        const OLD_COLORS = ["#6C5CE7", "#a855f7"];
+        const NEW_COLOR = "#D4AA40";
+        const migrated = data.map((v) => {
+          if (OLD_COLORS.includes(v.color)) {
+            supabase.from("visions").update({ color: NEW_COLOR }).eq("id", v.id);
+            return { ...v, color: NEW_COLOR };
+          }
+          return v;
+        });
+        set({ visions: migrated, loading: false });
       } else {
         set({ loading: false });
       }

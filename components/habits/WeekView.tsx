@@ -1,6 +1,6 @@
 import { View, Text, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 import { getWeekDates, DAY_LABELS_SHORT, parseDate, toDateString } from "../../lib/dateUtils";
 import { isHabitScheduledForDate } from "../../lib/habitUtils";
 import type { Tables } from "../../types/database";
@@ -12,6 +12,7 @@ type Props = {
 };
 
 export function WeekView({ habits, completions, weekOffset = 0 }: Props) {
+  const c = useColors();
   const today = new Date();
   today.setDate(today.getDate() + weekOffset * 7);
   const weekDates = getWeekDates(today);
@@ -27,16 +28,14 @@ export function WeekView({ habits, completions, weekOffset = 0 }: Props) {
           return (
             <View key={date} className="flex-1 items-center">
               <Text
-                className={`text-xs font-semibold ${
-                  isT ? "text-primary" : "text-text-muted"
-                }`}
+                className="text-xs font-semibold"
+                style={{ color: isT ? c.primary : c.textMuted }}
               >
                 {DAY_LABELS_SHORT[i]}
               </Text>
               <Text
-                className={`text-xs ${
-                  isT ? "text-primary" : "text-text-muted"
-                }`}
+                className="text-xs"
+                style={{ color: isT ? c.primary : c.textMuted }}
               >
                 {parseDate(date).getDate()}
               </Text>
@@ -47,14 +46,18 @@ export function WeekView({ habits, completions, weekOffset = 0 }: Props) {
 
       {/* Habit rows */}
       {habits.map((habit) => (
-        <View key={habit.id} className="flex-row items-center py-2 px-2 border-b border-surface">
+        <View
+          key={habit.id}
+          className="flex-row items-center py-2 px-2"
+          style={{ borderBottomWidth: 1, borderBottomColor: c.surface }}
+        >
           <View className="w-28 flex-row items-center">
             <Feather
               name={(habit.icon as any) || "circle"}
               size={14}
-              color={habit.color || colors.primary}
+              color={habit.color || c.primary}
             />
-            <Text className="text-text text-xs ml-2" numberOfLines={1}>
+            <Text className="text-xs ml-2" style={{ color: c.text }} numberOfLines={1}>
               {habit.name}
             </Text>
           </View>
@@ -67,13 +70,13 @@ export function WeekView({ habits, completions, weekOffset = 0 }: Props) {
             return (
               <View key={date} className="flex-1 items-center">
                 {!scheduled || isFuture ? (
-                  <View className="w-6 h-6 rounded-full bg-surface" />
+                  <View className="w-6 h-6 rounded-full" style={{ backgroundColor: c.surface }} />
                 ) : completed ? (
-                  <View className="w-6 h-6 rounded-full bg-primary items-center justify-center">
-                    <Feather name="check" size={12} color="#fff" />
+                  <View className="w-6 h-6 rounded-full items-center justify-center" style={{ backgroundColor: c.primary }}>
+                    <Feather name="check" size={12} color={c.primaryOnText} />
                   </View>
                 ) : (
-                  <View className="w-6 h-6 rounded-full bg-surface border border-text-muted" />
+                  <View className="w-6 h-6 rounded-full border" style={{ backgroundColor: c.surface, borderColor: c.textMuted }} />
                 )}
               </View>
             );

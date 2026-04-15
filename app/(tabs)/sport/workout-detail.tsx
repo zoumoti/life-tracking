@@ -7,7 +7,7 @@ import { Card } from "../../../components/ui/Card";
 import { useWorkoutStore } from "../../../stores/workoutStore";
 import { useExerciseStore } from "../../../stores/exerciseStore";
 import { formatDateLong, formatDuration } from "../../../lib/formatters";
-import { colors } from "../../../lib/theme";
+import { useColors } from "../../../lib/theme";
 import type { Tables } from "../../../types/database";
 
 type HistorySession = Tables<"workout_sessions"> & {
@@ -15,6 +15,7 @@ type HistorySession = Tables<"workout_sessions"> & {
 };
 
 export default function WorkoutDetailScreen() {
+  const c = useColors();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
   const { fetchSessionDetail } = useWorkoutStore();
@@ -30,7 +31,7 @@ export default function WorkoutDetailScreen() {
   if (!session) {
     return (
       <SafeScreen>
-        <Text className="text-text-secondary text-center mt-12">Chargement...</Text>
+        <Text style={{ color: c.textSecondary }} className="text-center mt-12">Chargement...</Text>
       </SafeScreen>
     );
   }
@@ -56,41 +57,41 @@ export default function WorkoutDetailScreen() {
     <SafeScreen>
       <View className="flex-row items-center mb-4">
         <Pressable onPress={() => router.back()} className="p-2">
-          <Feather name="arrow-left" size={24} color={colors.text} />
+          <Feather name="arrow-left" size={24} color={c.text} />
         </Pressable>
-        <Text className="text-text text-xl font-bold ml-2">{session.name}</Text>
+        <Text style={{ color: c.text }} className="text-xl font-bold ml-2">{session.name}</Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View className="flex-row justify-around mb-6 bg-surface rounded-card py-4">
+        <View style={{ backgroundColor: c.surface }} className="flex-row justify-around mb-6 rounded-card py-4">
           <View className="items-center">
-            <Text className="text-text font-bold text-lg">{formatDuration(duration)}</Text>
-            <Text className="text-text-secondary text-xs">Duree</Text>
+            <Text style={{ color: c.text }} className="font-bold text-lg">{formatDuration(duration)}</Text>
+            <Text style={{ color: c.textSecondary }} className="text-xs">Duree</Text>
           </View>
           <View className="items-center">
-            <Text className="text-text font-bold text-lg">{Math.round(totalVolume)} kg</Text>
-            <Text className="text-text-secondary text-xs">Volume</Text>
+            <Text style={{ color: c.text }} className="font-bold text-lg">{Math.round(totalVolume)} kg</Text>
+            <Text style={{ color: c.textSecondary }} className="text-xs">Volume</Text>
           </View>
           <View className="items-center">
-            <Text className="text-text font-bold text-lg">{session.sets.length}</Text>
-            <Text className="text-text-secondary text-xs">Series</Text>
+            <Text style={{ color: c.text }} className="font-bold text-lg">{session.sets.length}</Text>
+            <Text style={{ color: c.textSecondary }} className="text-xs">Series</Text>
           </View>
         </View>
 
-        <Text className="text-text-secondary text-sm mb-3">
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-3">
           {formatDateLong(session.started_at)}
         </Text>
 
         {exerciseGroups.map((group) => (
           <Card key={group.exerciseId} className="mb-3">
-            <Text className="text-text font-bold text-base mb-2">{group.exerciseName}</Text>
+            <Text style={{ color: c.text }} className="font-bold text-base mb-2">{group.exerciseName}</Text>
             {group.sets
               .sort((a, b) => a.set_number - b.set_number)
               .map((s) => (
                 <View key={s.id} className="flex-row items-center py-1">
-                  <Text className="text-text-muted text-sm w-8">{s.set_number}</Text>
-                  <Text className="text-text text-sm flex-1">{s.weight_kg} kg</Text>
-                  <Text className="text-text text-sm">{s.reps} reps</Text>
+                  <Text style={{ color: c.textMuted }} className="text-sm w-8">{s.set_number}</Text>
+                  <Text style={{ color: c.text }} className="text-sm flex-1">{s.weight_kg} kg</Text>
+                  <Text style={{ color: c.text }} className="text-sm">{s.reps} reps</Text>
                 </View>
               ))}
           </Card>

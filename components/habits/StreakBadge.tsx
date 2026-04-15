@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   current: number;
@@ -9,9 +9,10 @@ type Props = {
 };
 
 export function StreakBadge({ current, warning, isAvoid }: Props) {
+  const c = useColors();
   if (current === 0) return null;
 
-  const badgeColor = warning ? colors.warning : isAvoid ? colors.success : colors.primaryLight;
+  const badgeColor = warning ? c.warning : isAvoid ? c.success : c.primaryLight;
 
   return (
     <View className="flex-row items-center gap-1">

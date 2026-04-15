@@ -1,6 +1,6 @@
 import { View, Text } from "react-native";
 import Svg, { Circle } from "react-native-svg";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   progress: number; // 0 to 1
@@ -17,6 +17,7 @@ export function ProgressCircle({
   label,
   sublabel,
 }: Props) {
+  const c = useColors();
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
   const strokeDashoffset = circumference * (1 - Math.min(Math.max(progress, 0), 1));
@@ -30,7 +31,7 @@ export function ProgressCircle({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke={colors.surface}
+            stroke={c.surfaceLight}
             strokeWidth={strokeWidth}
           />
           <Circle
@@ -38,7 +39,7 @@ export function ProgressCircle({
             cy={size / 2}
             r={radius}
             fill="none"
-            stroke={colors.primary}
+            stroke={c.primary}
             strokeWidth={strokeWidth}
             strokeDasharray={`${circumference}`}
             strokeDashoffset={strokeDashoffset}
@@ -50,11 +51,11 @@ export function ProgressCircle({
             className="absolute items-center justify-center"
             style={{ width: size, height: size }}
           >
-            <Text className="text-text text-xl font-bold">{label}</Text>
+            <Text className="text-xl font-bold" style={{ color: c.text }}>{label}</Text>
           </View>
         )}
       </View>
-      {sublabel && <Text className="text-text-secondary text-xs mt-2">{sublabel}</Text>}
+      {sublabel && <Text className="text-xs mt-2" style={{ color: c.textSecondary }}>{sublabel}</Text>}
     </View>
   );
 }

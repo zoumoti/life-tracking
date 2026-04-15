@@ -1,4 +1,5 @@
 import { View, Pressable } from "react-native";
+import { useColors } from "../../lib/theme";
 
 type Props = {
   children: React.ReactNode;
@@ -7,8 +8,14 @@ type Props = {
 };
 
 export function Card({ children, onPress, className = "" }: Props) {
+  const c = useColors();
   const content = (
-    <View className={`bg-surface rounded-card p-4 ${className}`}>{children}</View>
+    <View
+      className={`rounded-card p-4 ${className}`}
+      style={{ backgroundColor: c.surface }}
+    >
+      {children}
+    </View>
   );
 
   if (onPress) {

@@ -1,6 +1,6 @@
 import { View, Text, Pressable, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 const HABIT_ICONS = [
   "sun", "moon", "book", "book-open", "edit-3", "pen-tool",
@@ -20,32 +20,27 @@ type Props = {
 };
 
 export function IconPicker({ selected, onSelect }: Props) {
+  const c = useColors();
+
   return (
     <View>
-      <Text className="text-text-secondary text-sm mb-2">Icone</Text>
-      <ScrollView
-        horizontal={false}
-        className="max-h-40"
-        showsVerticalScrollIndicator={false}
-      >
-        <View className="flex-row flex-wrap gap-2">
-          {HABIT_ICONS.map((icon) => (
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Icone</Text>
+      <View className="flex-row flex-wrap gap-2">
+        {HABIT_ICONS.map((icon) => (
             <Pressable
               key={icon}
               onPress={() => onSelect(icon)}
-              className={`w-10 h-10 rounded-lg items-center justify-center ${
-                selected === icon ? "bg-primary" : "bg-surface-light"
-              }`}
+              className="w-10 h-10 rounded-lg items-center justify-center"
+              style={{ backgroundColor: selected === icon ? c.primary : c.surfaceLight }}
             >
               <Feather
                 name={icon as any}
                 size={20}
-                color={selected === icon ? "#fff" : colors.textSecondary}
+                color={selected === icon ? c.primaryOnText : c.textSecondary}
               />
             </Pressable>
           ))}
-        </View>
-      </ScrollView>
+      </View>
     </View>
   );
 }

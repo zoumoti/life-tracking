@@ -68,6 +68,7 @@ type WorkoutState = {
   sessions: HistorySession[];
   sessionsLoading: boolean;
   fetchSessions: () => Promise<void>;
+  deleteSession: (id: string) => Promise<{ error: string | null }>;
   fetchSessionDetail: (id: string) => Promise<HistorySession | null>;
 
   // Last sets cache (per exercise)
@@ -280,6 +281,14 @@ export const useWorkoutStore = create<WorkoutState>()(
           .order("started_at", { ascending: false });
 
         set({ sessions: (data as unknown as HistorySession[]) ?? [], sessionsLoading: false });
+      },
+
+      deleteSession: async (id) => {
+        const { error } = await supabase.from("workout_sessions").delete().eq("id", id);
+        if (!error) {
+          set({ sessions: get().sessions.filter((s) => s.id !== id) });
+        }
+        return { error: error?.message ?? null };
       },
 
       fetchSessionDetail: async (id) => {

@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { View, Text, Pressable, FlatList } from "react-native";
 import { useRouter } from "expo-router";
 import { Feather } from "@expo/vector-icons";
-import GorhomBottomSheet from "@gorhom/bottom-sheet";
+import { BottomSheetModal } from "@gorhom/bottom-sheet";
 import { SafeScreen } from "../../components/SafeScreen";
 import { Card } from "../../components/ui/Card";
 import { BottomSheet } from "../../components/ui/BottomSheet";
@@ -14,13 +14,14 @@ import { MonthView } from "../../components/habits/MonthView";
 import { useHabitStore } from "../../stores/habitStore";
 import { toDateString, addDays } from "../../lib/dateUtils";
 import { isHabitScheduledForDate, calculateStreak } from "../../lib/habitUtils";
-import { colors } from "../../lib/theme";
+import { useColors } from "../../lib/theme";
 
 type ViewMode = "day" | "week" | "month";
 
 export default function HabitsScreen() {
+  const c = useColors();
   const router = useRouter();
-  const bottomSheetRef = useRef<GorhomBottomSheet>(null);
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
   const [viewMode, setViewMode] = useState<ViewMode>("day");
   const [creating, setCreating] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
@@ -83,7 +84,7 @@ export default function HabitsScreen() {
         time_of_day: data.time_of_day,
       });
       setCreating(false);
-      bottomSheetRef.current?.close();
+      bottomSheetRef.current?.dismiss();
     },
     [createHabit]
   );
@@ -97,7 +98,7 @@ export default function HabitsScreen() {
 
   const openCreate = () => {
     setCreating(true);
-    bottomSheetRef.current?.snapToIndex(1);
+    bottomSheetRef.current?.present();
   };
 
   const handleChangeMonth = (delta: number) => {
@@ -114,28 +115,26 @@ export default function HabitsScreen() {
     <SafeScreen>
       {/* Header */}
       <View className="flex-row items-center justify-between mb-4 mt-2">
-        <Text className="text-text text-2xl font-bold">Habitudes</Text>
+        <Text style={{ color: c.text }} className="text-2xl font-bold">Habitudes</Text>
         {viewMode === "day" && (
-          <Text className="text-text-secondary text-sm">
+          <Text style={{ color: c.textSecondary }} className="text-sm">
             {completedCount}/{todayHabits.length}
           </Text>
         )}
       </View>
 
       {/* View mode tabs */}
-      <View className="flex-row bg-surface rounded-button p-1 mb-4">
+      <View style={{ backgroundColor: c.surface }} className="flex-row rounded-button p-1 mb-4">
         {(["day", "week", "month"] as ViewMode[]).map((mode) => (
           <Pressable
             key={mode}
             onPress={() => setViewMode(mode)}
-            className={`flex-1 py-2 rounded-button items-center ${
-              viewMode === mode ? "bg-primary" : ""
-            }`}
+            className="flex-1 py-2 rounded-button items-center"
+            style={viewMode === mode ? { backgroundColor: c.primary } : undefined}
           >
             <Text
-              className={`text-sm font-semibold ${
-                viewMode === mode ? "text-white" : "text-text-secondary"
-              }`}
+              style={{ color: viewMode === mode ? c.primaryOnText : c.textSecondary }}
+              className="text-sm font-semibold"
             >
               {mode === "day" ? "Jour" : mode === "week" ? "Semaine" : "Mois"}
             </Text>
@@ -148,11 +147,11 @@ export default function HabitsScreen() {
         <>
           {sortedTodayHabits.length === 0 && !loading ? (
             <View className="flex-1 items-center justify-center">
-              <Feather name="plus-circle" size={48} color={colors.textMuted} />
-              <Text className="text-text-secondary text-base mt-4">
+              <Feather name="plus-circle" size={48} color={c.textMuted} />
+              <Text style={{ color: c.textSecondary }} className="text-base mt-4">
                 Aucune habitude pour aujourd'hui
               </Text>
-              <Text className="text-text-muted text-sm mt-1">
+              <Text style={{ color: c.textMuted }} className="text-sm mt-1">
                 Appuie sur + pour en creer une
               </Text>
             </View>
@@ -178,7 +177,7 @@ export default function HabitsScreen() {
                   );
                 }}
                 ItemSeparatorComponent={() => (
-                  <View className="h-px bg-surface mx-3" />
+                  <View style={{ height: 1, backgroundColor: c.surface }} className="mx-3" />
                 )}
               />
             </Card>
@@ -207,10 +206,10 @@ export default function HabitsScreen() {
       {/* FAB */}
       <Pressable
         onPress={openCreate}
-        className="absolute bottom-6 right-4 w-14 h-14 rounded-full bg-primary items-center justify-center active:opacity-80"
-        style={{ elevation: 4 }}
+        className="absolute bottom-6 right-4 w-14 h-14 rounded-full items-center justify-center active:opacity-80"
+        style={{ elevation: 4, backgroundColor: c.primary }}
       >
-        <Feather name="plus" size={28} color="#fff" />
+        <Feather name="plus" size={28} color="#1a1608" />
       </Pressable>
 
       {/* Create Habit Bottom Sheet */}
@@ -225,7 +224,7 @@ export default function HabitsScreen() {
             onSubmit={handleCreate}
             onCancel={() => {
               setCreating(false);
-              bottomSheetRef.current?.close();
+              bottomSheetRef.current?.dismiss();
             }}
           />
         )}

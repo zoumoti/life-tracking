@@ -72,6 +72,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="tasks"
+        options={{
+          title: "Taches",
+          tabBarIcon: ({ color, size }) => (
+            <Feather name="check-square" size={size} color={color} />
+          ),
+        }}
+      />
       {/* Hide sub-routes from tab bar */}
       <Tabs.Screen name="sport/index" options={{ href: null }} />
       <Tabs.Screen name="sport/exercises" options={{ href: null }} />
@@ -85,6 +94,8 @@ export default function TabLayout() {
       <Tabs.Screen name="sport/_layout" options={{ href: null }} />
       <Tabs.Screen name="finance/index" options={{ href: null }} />
       <Tabs.Screen name="finance/_layout" options={{ href: null }} />
+      <Tabs.Screen name="tasks/index" options={{ href: null }} />
+      <Tabs.Screen name="tasks/_layout" options={{ href: null }} />
     </Tabs>
   );
 }

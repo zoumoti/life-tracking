@@ -5,11 +5,12 @@ import { useRouter } from "expo-router";
 import { SafeScreen } from "../../../components/SafeScreen";
 import { Card } from "../../../components/ui/Card";
 import { Button } from "../../../components/ui/Button";
+import { ConfirmModal } from "../../../components/ui/ConfirmModal";
 import { useWorkoutStore } from "../../../stores/workoutStore";
 import { useRunningStore } from "../../../stores/runningStore";
 import { useExerciseStore } from "../../../stores/exerciseStore";
 import { formatDuration, formatDateShort, formatPace } from "../../../lib/formatters";
-import { colors } from "../../../lib/theme";
+import { useColors } from "../../../lib/theme";
 
 function useTimer(startedAt: number | null) {
   const [elapsed, setElapsed] = useState(0);
@@ -22,11 +23,17 @@ function useTimer(startedAt: number | null) {
 }
 
 export default function SportHubScreen() {
+  const c = useColors();
   const router = useRouter();
   const { currentSession, programs, fetchPrograms, startSession } = useWorkoutStore();
   const { fetchRuns, getStats, runs } = useRunningStore();
   const { fetchExercises } = useExerciseStore();
   const elapsed = useTimer(currentSession?.startedAt ?? null);
+
+  const [pendingStart, setPendingStart] = useState<{
+    type: "free" | "program";
+    program?: { id: string; name: string; exercises: { id: string; name: string }[] };
+  } | null>(null);
 
   useEffect(() => {
     fetchPrograms();
@@ -37,28 +44,35 @@ export default function SportHubScreen() {
   const stats = getStats();
   const lastRun = runs[0];
 
-  const handleFreeSession = () => {
-    startSession();
+  const confirmStart = () => {
+    if (!pendingStart) return;
+    if (pendingStart.type === "free") {
+      startSession();
+    } else if (pendingStart.program) {
+      startSession(pendingStart.program.id, pendingStart.program.name, pendingStart.program.exercises);
+    }
+    setPendingStart(null);
     router.push("/(tabs)/sport/active-workout" as any);
   };
 
   return (
     <SafeScreen>
-      <Text className="text-text text-2xl font-bold mb-6">Sport</Text>
+      <Text style={{ color: c.text }} className="text-2xl font-bold mb-6">Sport</Text>
 
       {/* Active session banner */}
       {currentSession && (
         <Pressable
           onPress={() => router.push("/(tabs)/sport/active-workout" as any)}
-          className="bg-primary/20 border border-primary rounded-card px-4 py-3 mb-4 flex-row items-center justify-between active:opacity-80"
+          style={{ backgroundColor: c.primary + "33", borderColor: c.primary }}
+          className="border rounded-card px-4 py-3 mb-4 flex-row items-center justify-between active:opacity-80"
         >
           <View className="flex-row items-center">
-            <Feather name="activity" size={20} color={colors.primary} />
-            <Text className="text-primary font-bold text-base ml-2">
+            <Feather name="activity" size={20} color={c.primary} />
+            <Text style={{ color: c.primary }} className="font-bold text-base ml-2">
               Seance en cours
             </Text>
           </View>
-          <Text className="text-primary font-bold text-lg">
+          <Text style={{ color: c.primary }} className="font-bold text-lg">
             {formatDuration(elapsed)}
           </Text>
         </Pressable>
@@ -66,28 +80,28 @@ export default function SportHubScreen() {
 
       {/* Muscu section */}
       <Card className="mb-4">
-        <Text className="text-text font-bold text-lg mb-3">Musculation</Text>
+        <Text style={{ color: c.text }} className="font-bold text-lg mb-3">Musculation</Text>
 
         {!currentSession && (
           <View className="gap-2 mb-3">
-            <Button title="Seance libre" onPress={handleFreeSession} />
+            <Button title="Seance libre" onPress={() => setPendingStart({ type: "free" })} />
             {programs.length > 0 && (
               <View>
-                <Text className="text-text-secondary text-xs mb-2 mt-2">Depuis un programme :</Text>
+                <Text style={{ color: c.textSecondary }} className="text-xs mb-2 mt-2">Depuis un programme :</Text>
                 {programs.slice(0, 3).map((p) => (
                   <Pressable
                     key={p.id}
-                    className="flex-row items-center justify-between py-2 border-b border-surface-light active:opacity-70"
+                    style={{ borderBottomColor: c.surfaceLight }}
+                    className="flex-row items-center justify-between py-2 border-b active:opacity-70"
                     onPress={() => {
                       const exercises = p.exercises
                         .sort((a, b) => a.sort_order - b.sort_order)
                         .map((pe) => ({ id: pe.exercise.id, name: pe.exercise.name }));
-                      startSession(p.id, p.name, exercises);
-                      router.push("/(tabs)/sport/active-workout" as any);
+                      setPendingStart({ type: "program", program: { id: p.id, name: p.name, exercises } });
                     }}
                   >
-                    <Text className="text-text text-sm">{p.name}</Text>
-                    <Feather name="play" size={16} color={colors.primary} />
+                    <Text style={{ color: c.text }} className="text-sm">{p.name}</Text>
+                    <Feather name="play" size={16} color={c.primary} />
                   </Pressable>
                 ))}
               </View>
@@ -98,42 +112,45 @@ export default function SportHubScreen() {
         <View className="flex-row gap-2 mt-2">
           <Pressable
             onPress={() => router.push("/(tabs)/sport/programs" as any)}
-            className="flex-1 bg-surface-light rounded-button py-2 items-center active:opacity-70"
+            style={{ backgroundColor: c.surfaceLight }}
+            className="flex-1 rounded-button py-2 items-center active:opacity-70"
           >
-            <Text className="text-text-secondary text-sm">Programmes</Text>
+            <Text style={{ color: c.textSecondary }} className="text-sm">Programmes</Text>
           </Pressable>
           <Pressable
             onPress={() => router.push("/(tabs)/sport/exercises" as any)}
-            className="flex-1 bg-surface-light rounded-button py-2 items-center active:opacity-70"
+            style={{ backgroundColor: c.surfaceLight }}
+            className="flex-1 rounded-button py-2 items-center active:opacity-70"
           >
-            <Text className="text-text-secondary text-sm">Exercices</Text>
+            <Text style={{ color: c.textSecondary }} className="text-sm">Exercices</Text>
           </Pressable>
           <Pressable
             onPress={() => router.push("/(tabs)/sport/workout-history" as any)}
-            className="flex-1 bg-surface-light rounded-button py-2 items-center active:opacity-70"
+            style={{ backgroundColor: c.surfaceLight }}
+            className="flex-1 rounded-button py-2 items-center active:opacity-70"
           >
-            <Text className="text-text-secondary text-sm">Historique</Text>
+            <Text style={{ color: c.textSecondary }} className="text-sm">Historique</Text>
           </Pressable>
         </View>
       </Card>
 
       {/* Course section */}
       <Card>
-        <Text className="text-text font-bold text-lg mb-3">Course a pied</Text>
+        <Text style={{ color: c.text }} className="font-bold text-lg mb-3">Course a pied</Text>
 
         <View className="flex-row justify-around mb-3">
           <View className="items-center">
-            <Text className="text-text font-bold text-base">
+            <Text style={{ color: c.text }} className="font-bold text-base">
               {Math.round(stats.thisWeekDistance * 10) / 10} km
             </Text>
-            <Text className="text-text-muted text-xs">Cette semaine</Text>
+            <Text style={{ color: c.textMuted }} className="text-xs">Cette semaine</Text>
           </View>
           {lastRun && (
             <View className="items-center">
-              <Text className="text-text font-bold text-base">
+              <Text style={{ color: c.text }} className="font-bold text-base">
                 {formatPace(lastRun.duration_minutes, lastRun.distance_km)} /km
               </Text>
-              <Text className="text-text-muted text-xs">
+              <Text style={{ color: c.textMuted }} className="text-xs">
                 Derniere ({formatDateShort(lastRun.date)})
               </Text>
             </View>
@@ -148,12 +165,27 @@ export default function SportHubScreen() {
           />
           <Pressable
             onPress={() => router.push("/(tabs)/sport/running" as any)}
-            className="bg-surface-light rounded-button py-3 px-4 items-center justify-center active:opacity-70"
+            style={{ backgroundColor: c.surfaceLight }}
+            className="rounded-button py-3 px-4 items-center justify-center active:opacity-70"
           >
-            <Feather name="bar-chart-2" size={20} color={colors.textSecondary} />
+            <Feather name="bar-chart-2" size={20} color={c.textSecondary} />
           </Pressable>
         </View>
       </Card>
+
+      <ConfirmModal
+        visible={!!pendingStart}
+        title="Demarrer une seance ?"
+        message={
+          pendingStart?.type === "free"
+            ? "Tu vas commencer une seance libre."
+            : `Tu vas commencer "${pendingStart?.program?.name ?? ""}".`
+        }
+        confirmLabel="Demarrer"
+        destructive={false}
+        onConfirm={confirmStart}
+        onCancel={() => setPendingStart(null)}
+      />
     </SafeScreen>
   );
 }
