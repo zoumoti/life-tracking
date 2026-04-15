@@ -1,138 +1,79 @@
 import { useEffect, useState, useCallback } from "react";
-import * as AuthSession from "expo-auth-session";
-import * as WebBrowser from "expo-web-browser";
+import {
+  GoogleSignin,
+  statusCodes,
+} from "@react-native-google-signin/google-signin";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-WebBrowser.maybeCompleteAuthSession();
+const STORAGE_KEY_CONNECTED = "google_connected";
 
-const GOOGLE_CLIENT_ID = "1063289815690-6eggvslg2kn9buvbqa3fc95io2qmn0gp.apps.googleusercontent.com";
-
-const SCOPES = [
-  "https://www.googleapis.com/auth/tasks",
-  "https://www.googleapis.com/auth/calendar.events",
-];
-
-const STORAGE_KEY_ACCESS = "google_access_token";
-const STORAGE_KEY_REFRESH = "google_refresh_token";
-const STORAGE_KEY_EXPIRY = "google_token_expiry";
-
-const discovery = {
-  authorizationEndpoint: "https://accounts.google.com/o/oauth2/v2/auth",
-  tokenEndpoint: "https://oauth2.googleapis.com/token",
-  revocationEndpoint: "https://oauth2.googleapis.com/revoke",
-};
+GoogleSignin.configure({
+  webClientId: "1063289815690-6eggvslg2kn9buvbqa3fc95io2qmn0gp.apps.googleusercontent.com",
+  scopes: [
+    "https://www.googleapis.com/auth/tasks",
+    "https://www.googleapis.com/auth/calendar.events",
+  ],
+  offlineAccess: true,
+});
 
 export function useGoogleAuth() {
   const [isConnected, setIsConnected] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const redirectUri = AuthSession.makeRedirectUri();
-
-  const [request, response, promptAsync] = AuthSession.useAuthRequest(
-    {
-      clientId: GOOGLE_CLIENT_ID,
-      scopes: SCOPES,
-      redirectUri,
-      responseType: AuthSession.ResponseType.Code,
-      usePKCE: true,
-    },
-    discovery
-  );
-
-  // Check stored tokens on mount
   useEffect(() => {
     (async () => {
-      const token = await AsyncStorage.getItem(STORAGE_KEY_ACCESS);
-      setIsConnected(!!token);
+      const stored = await AsyncStorage.getItem(STORAGE_KEY_CONNECTED);
+      if (stored === "true") {
+        // Verify still signed in
+        const isSignedIn = GoogleSignin.getCurrentUser();
+        setIsConnected(!!isSignedIn);
+        if (!isSignedIn) {
+          await AsyncStorage.removeItem(STORAGE_KEY_CONNECTED);
+        }
+      }
     })();
   }, []);
 
-  // Handle auth response
-  useEffect(() => {
-    if (response?.type === "success" && response.params.code) {
-      exchangeCode(response.params.code, request?.codeVerifier ?? "");
-    }
-  }, [response]);
-
-  const exchangeCode = async (code: string, codeVerifier: string) => {
+  const connect = useCallback(async () => {
     try {
       setLoading(true);
-      const tokenResponse = await AuthSession.exchangeCodeAsync(
-        {
-          clientId: GOOGLE_CLIENT_ID,
-          code,
-          redirectUri,
-          extraParams: { code_verifier: codeVerifier },
-        },
-        discovery
-      );
-
-      if (tokenResponse.accessToken) {
-        await AsyncStorage.setItem(STORAGE_KEY_ACCESS, tokenResponse.accessToken);
-        if (tokenResponse.refreshToken) {
-          await AsyncStorage.setItem(STORAGE_KEY_REFRESH, tokenResponse.refreshToken);
-        }
-        const expiry = Date.now() + (tokenResponse.expiresIn ?? 3600) * 1000;
-        await AsyncStorage.setItem(STORAGE_KEY_EXPIRY, String(expiry));
-        setIsConnected(true);
+      await GoogleSignin.hasPlayServices();
+      await GoogleSignin.signIn();
+      await AsyncStorage.setItem(STORAGE_KEY_CONNECTED, "true");
+      setIsConnected(true);
+    } catch (error: any) {
+      if (error.code !== statusCodes.SIGN_IN_CANCELLED) {
+        console.warn("Google Sign-In failed:", error);
       }
-    } catch (e) {
-      console.warn("Google token exchange failed:", e);
     } finally {
       setLoading(false);
     }
-  };
-
-  const connect = useCallback(() => {
-    promptAsync();
-  }, [promptAsync]);
+  }, []);
 
   const disconnect = useCallback(async () => {
-    await AsyncStorage.multiRemove([STORAGE_KEY_ACCESS, STORAGE_KEY_REFRESH, STORAGE_KEY_EXPIRY]);
+    try {
+      await GoogleSignin.signOut();
+    } catch {}
+    await AsyncStorage.removeItem(STORAGE_KEY_CONNECTED);
     setIsConnected(false);
   }, []);
 
-  return { isConnected, loading, connect, disconnect, request };
+  return { isConnected, loading, connect, disconnect };
 }
 
 /**
- * Returns a valid access token, refreshing if needed.
- * Returns null if not connected.
+ * Returns a valid access token for Google API calls.
+ * Returns null if not signed in.
  */
 export async function getValidAccessToken(): Promise<string | null> {
-  const token = await AsyncStorage.getItem(STORAGE_KEY_ACCESS);
-  if (!token) return null;
-
-  const expiryStr = await AsyncStorage.getItem(STORAGE_KEY_EXPIRY);
-  const expiry = expiryStr ? Number(expiryStr) : 0;
-
-  // If token has more than 5 min left, use it
-  if (Date.now() < expiry - 5 * 60 * 1000) {
-    return token;
-  }
-
-  // Try refresh
-  const refreshToken = await AsyncStorage.getItem(STORAGE_KEY_REFRESH);
-  if (!refreshToken) return null;
-
   try {
-    const resp = await AuthSession.refreshAsync(
-      {
-        clientId: GOOGLE_CLIENT_ID,
-        refreshToken,
-      },
-      discovery
-    );
+    const currentUser = GoogleSignin.getCurrentUser();
+    if (!currentUser) return null;
 
-    if (resp.accessToken) {
-      await AsyncStorage.setItem(STORAGE_KEY_ACCESS, resp.accessToken);
-      const newExpiry = Date.now() + (resp.expiresIn ?? 3600) * 1000;
-      await AsyncStorage.setItem(STORAGE_KEY_EXPIRY, String(newExpiry));
-      return resp.accessToken;
-    }
+    const tokens = await GoogleSignin.getTokens();
+    return tokens.accessToken;
   } catch (e) {
-    console.warn("Google token refresh failed:", e);
+    console.warn("Failed to get Google token:", e);
+    return null;
   }
-
-  return null;
 }

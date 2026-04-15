@@ -60,40 +60,24 @@ export const useTaskStore = createPersistedStore<TaskState>(
     addTask: async (input) => {
       const userId = await getUserId();
       if (!userId) return;
-      const id = crypto.randomUUID();
-      const now = new Date().toISOString();
 
-      const newTask: Task = {
-        id,
-        user_id: userId,
-        title: input.title,
-        notes: input.notes ?? null,
-        due_date: input.due_date ?? null,
-        priority: input.priority ?? "normal",
-        completed: false,
-        completed_at: null,
-        google_task_id: null,
-        google_event_id: null,
-        created_at: now,
-      };
+      // Let Supabase generate the UUID
+      const { data, error } = await getSupabase()
+        .from("tasks")
+        .insert({
+          user_id: userId,
+          title: input.title,
+          notes: input.notes ?? null,
+          due_date: input.due_date ?? null,
+          priority: input.priority ?? "normal",
+        })
+        .select()
+        .single();
 
-      // Optimistic update
+      if (error || !data) return;
+
+      const newTask = data as unknown as Task;
       set({ tasks: [newTask, ...get().tasks] });
-
-      const { error } = await getSupabase().from("tasks").insert({
-        id,
-        user_id: userId,
-        title: input.title,
-        notes: input.notes ?? null,
-        due_date: input.due_date ?? null,
-        priority: input.priority ?? "normal",
-      });
-
-      if (error) {
-        // Rollback
-        set({ tasks: get().tasks.filter((t) => t.id !== id) });
-        return;
-      }
 
       // Background Google sync
       syncTaskToGoogle(newTask).then((ids) => {
@@ -102,10 +86,10 @@ export const useTaskStore = createPersistedStore<TaskState>(
           if (ids.googleTaskId) updates.google_task_id = ids.googleTaskId;
           if (ids.googleEventId) updates.google_event_id = ids.googleEventId;
 
-          getSupabase().from("tasks").update(updates).eq("id", id).then(() => {
+          getSupabase().from("tasks").update(updates).eq("id", newTask.id).then(() => {
             set({
               tasks: get().tasks.map((t) =>
-                t.id === id ? { ...t, ...updates } : t
+                t.id === newTask.id ? { ...t, ...updates } : t
               ),
             });
           });
