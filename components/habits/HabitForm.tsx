@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
+import { View, Text, TextInput, Pressable, ScrollView, Platform } from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { Feather } from "@expo/vector-icons";
 import { useColors } from "../../lib/theme";
 import { Button } from "../ui/Button";
@@ -20,6 +21,7 @@ export type HabitFormData = {
   frequency_value: number;
   frequency_days: number[];
   time_of_day: HabitMoment;
+  reminder_time: string | null;
 };
 
 type Props = {
@@ -56,6 +58,10 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
   const [timeOfDay, setTimeOfDay] = useState<HabitMoment>(
     initial?.time_of_day ?? "anytime"
   );
+  const [reminderTime, setReminderTime] = useState<string | null>(
+    initial?.reminder_time ?? null
+  );
+  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const toggleDay = (day: number) => {
     setFrequencyDays((prev) =>
@@ -74,6 +80,7 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
       frequency_value: frequencyValue,
       frequency_days: frequencyDays,
       time_of_day: timeOfDay,
+      reminder_time: reminderTime,
     });
   };
 
@@ -235,6 +242,64 @@ export function HabitForm({ initial, onSubmit, onCancel, loading }: Props) {
           )
         )}
       </View>
+
+      {/* Reminder Time */}
+      <Text className="text-sm mb-2" style={{ color: c.textSecondary }}>Rappel</Text>
+      <View className="flex-row items-center gap-3 mb-6">
+        <Pressable
+          onPress={() => {
+            if (reminderTime) {
+              setReminderTime(null);
+            } else {
+              setReminderTime("08:00");
+              setShowTimePicker(true);
+            }
+          }}
+          className="flex-row items-center gap-2 px-4 py-3 rounded-button flex-1"
+          style={{ backgroundColor: c.surfaceLight }}
+        >
+          <Feather
+            name={reminderTime ? "bell" : "bell-off"}
+            size={16}
+            color={reminderTime ? c.primary : c.textMuted}
+          />
+          <Text style={{ color: reminderTime ? c.text : c.textMuted }} className="text-base">
+            {reminderTime ? `Tous les jours a ${reminderTime}` : "Aucun rappel"}
+          </Text>
+        </Pressable>
+        {reminderTime && (
+          <Pressable
+            onPress={() => setShowTimePicker(true)}
+            className="px-3 py-3 rounded-button"
+            style={{ backgroundColor: c.primary }}
+          >
+            <Feather name="edit-2" size={16} color={c.primaryOnText} />
+          </Pressable>
+        )}
+      </View>
+      {showTimePicker && (
+        <DateTimePicker
+          value={(() => {
+            const d = new Date();
+            if (reminderTime) {
+              const [h, m] = reminderTime.split(":").map(Number);
+              d.setHours(h, m, 0, 0);
+            }
+            return d;
+          })()}
+          mode="time"
+          is24Hour={true}
+          display={Platform.OS === "ios" ? "spinner" : "default"}
+          onChange={(_, selected) => {
+            setShowTimePicker(Platform.OS === "ios");
+            if (selected) {
+              const h = String(selected.getHours()).padStart(2, "0");
+              const m = String(selected.getMinutes()).padStart(2, "0");
+              setReminderTime(`${h}:${m}`);
+            }
+          }}
+        />
+      )}
 
       {/* Submit */}
       <View className="flex-row gap-3">

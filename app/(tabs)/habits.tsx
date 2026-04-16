@@ -82,6 +82,7 @@ export default function HabitsScreen() {
         frequency_value: data.frequency_value,
         frequency_days: data.frequency_days.length > 0 ? data.frequency_days : null,
         time_of_day: data.time_of_day,
+        reminder_time: data.reminder_time,
       });
       setCreating(false);
       bottomSheetRef.current?.dismiss();

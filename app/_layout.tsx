@@ -50,6 +50,27 @@ export default function RootLayout() {
     return () => { cleanup?.(); };
   }, [session]);
 
+  // Habit reminder notifications: schedule on login & habit changes
+  useEffect(() => {
+    if (!session) return;
+
+    const loadNotif = async () => {
+      const { scheduleHabitNotifications } = await import("../lib/habitNotifications");
+
+      // Initial schedule
+      scheduleHabitNotifications();
+
+      // Re-schedule when habits change
+      const unsub = useHabitStore.subscribe(() => scheduleHabitNotifications());
+      return () => unsub();
+    };
+
+    let cleanup: (() => void) | undefined;
+    loadNotif().then((fn) => { cleanup = fn; });
+
+    return () => { cleanup?.(); };
+  }, [session]);
+
   useEffect(() => {
     Notifications.requestPermissionsAsync();
   }, []);
