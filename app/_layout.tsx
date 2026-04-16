@@ -12,6 +12,15 @@ import { useThemeStore } from "../stores/themeStore";
 import { useHabitStore } from "../stores/habitStore";
 import { useTaskStore } from "../stores/taskStore";
 
+/** Simple debounce — returns a debounced version of fn */
+function debounce(fn: () => void, ms: number) {
+  let timer: ReturnType<typeof setTimeout>;
+  return () => {
+    clearTimeout(timer);
+    timer = setTimeout(fn, ms);
+  };
+}
+
 export default function RootLayout() {
   const { initialize, loading, session } = useAuthStore();
   const c = useColors();
@@ -23,20 +32,19 @@ export default function RootLayout() {
     initialize();
   }, []);
 
-  // Widget sync: subscribe to store changes and sync on Android
+  // Widget sync: debounced, only on Android
   useEffect(() => {
     if (Platform.OS !== "android" || !session) return;
 
-    // Lazy import to avoid require cycles (stores → widgetSync → stores)
     const loadSync = async () => {
       const { syncWidgetData } = await import("../widgets/shared/widgetSync");
 
-      // Initial sync
       syncWidgetData();
 
-      // Subscribe to habit/task changes
-      const unsubHabits = useHabitStore.subscribe(() => syncWidgetData());
-      const unsubTasks = useTaskStore.subscribe(() => syncWidgetData());
+      // Debounce: wait 2s after last store change before syncing
+      const debouncedSync = debounce(syncWidgetData, 2000);
+      const unsubHabits = useHabitStore.subscribe(debouncedSync);
+      const unsubTasks = useTaskStore.subscribe(debouncedSync);
 
       return () => {
         unsubHabits();
@@ -50,18 +58,18 @@ export default function RootLayout() {
     return () => { cleanup?.(); };
   }, [session]);
 
-  // Habit reminder notifications: schedule on login & habit changes
+  // Habit reminder notifications: debounced re-schedule
   useEffect(() => {
     if (!session) return;
 
     const loadNotif = async () => {
       const { scheduleHabitNotifications } = await import("../lib/habitNotifications");
 
-      // Initial schedule
       scheduleHabitNotifications();
 
-      // Re-schedule when habits change
-      const unsub = useHabitStore.subscribe(() => scheduleHabitNotifications());
+      // Debounce: wait 3s after last habit change before re-scheduling
+      const debouncedSchedule = debounce(scheduleHabitNotifications, 3000);
+      const unsub = useHabitStore.subscribe(debouncedSchedule);
       return () => unsub();
     };
 
@@ -93,7 +101,6 @@ export default function RootLayout() {
     );
   }
 
-  // Auth guard: redirect based on session state
   const inAuthGroup = segments[0] === "(auth)";
 
   return (
@@ -117,7 +124,6 @@ export default function RootLayout() {
             options={{ headerShown: true }}
           />
         </Stack>
-        {/* Redirect after Stack is rendered */}
         {!session && !inAuthGroup && <Redirect href="/(auth)/login" />}
         {session && inAuthGroup && <Redirect href="/(tabs)" />}
       </BottomSheetModalProvider>

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { View, Text, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import {
@@ -24,14 +25,27 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
   const grid = getMonthGrid(year, month);
   const todayStr = toDateString();
 
-  function dayIntensity(dateStr: string): number {
-    const activeHabits = habits.filter((h) => isHabitScheduledForDate(h, dateStr));
-    if (activeHabits.length === 0) return 0;
-    const completed = activeHabits.filter(
-      (h) => completions[`${h.id}:${dateStr}`]
-    ).length;
-    return completed / activeHabits.length;
-  }
+  // Precompute intensity map (avoids recalculating 42 times per render)
+  const intensityMap = useMemo(() => {
+    const map: Record<string, number> = {};
+    grid.forEach((dateStr) => {
+      const dateObj = parseDate(dateStr);
+      if (dateObj.getMonth() !== month) {
+        map[dateStr] = 0;
+        return;
+      }
+      const activeHabits = habits.filter((h) => isHabitScheduledForDate(h, dateStr));
+      if (activeHabits.length === 0) {
+        map[dateStr] = 0;
+        return;
+      }
+      const completed = activeHabits.filter(
+        (h) => completions[`${h.id}:${dateStr}`]
+      ).length;
+      map[dateStr] = completed / activeHabits.length;
+    });
+    return map;
+  }, [habits, completions, year, month]);
 
   function intensityColor(intensity: number): string {
     if (intensity === 0) return c.surface;
@@ -73,7 +87,7 @@ export function MonthView({ habits, completions, year, month, onChangeMonth }: P
             const dateObj = parseDate(dateStr);
             const isCurrentMonth = dateObj.getMonth() === month;
             const isT = dateStr === todayStr;
-            const intensity = isCurrentMonth ? dayIntensity(dateStr) : 0;
+            const intensity = intensityMap[dateStr] ?? 0;
 
             return (
               <View key={dateStr} className="flex-1 items-center py-1">

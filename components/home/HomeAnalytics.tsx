@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { View, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { Card } from "../ui/Card";
@@ -28,17 +29,19 @@ export function HomeAnalytics({
   const c = useColors();
   const today = toDateString();
 
-  // Calculate last 7 days habit completion rates
-  const weekData = Array.from({ length: 7 }, (_, i) => {
-    const date = addDays(today, i - 6);
-    const scheduled = habits.filter((h) => isHabitScheduledForDate(h, date));
-    const completed = scheduled.filter((h) => completions[`${h.id}:${date}`]);
-    const rate = scheduled.length > 0 ? completed.length / scheduled.length : 0;
-    const dayOfWeek = isoDayOfWeek(parseDate(date));
-    return { date, rate, label: DAY_LABELS[dayOfWeek], isToday: date === today };
-  });
-
-  const avgRate = weekData.reduce((sum, d) => sum + d.rate, 0) / 7;
+  // Calculate last 7 days habit completion rates (memoized)
+  const { weekData, avgRate } = useMemo(() => {
+    const data = Array.from({ length: 7 }, (_, i) => {
+      const date = addDays(today, i - 6);
+      const scheduled = habits.filter((h) => isHabitScheduledForDate(h, date));
+      const completed = scheduled.filter((h) => completions[`${h.id}:${date}`]);
+      const rate = scheduled.length > 0 ? completed.length / scheduled.length : 0;
+      const dayOfWeek = isoDayOfWeek(parseDate(date));
+      return { date, rate, label: DAY_LABELS[dayOfWeek], isToday: date === today };
+    });
+    const avg = data.reduce((sum, d) => sum + d.rate, 0) / 7;
+    return { weekData: data, avgRate: avg };
+  }, [habits, completions, today]);
 
   return (
     <View className="mb-4">
