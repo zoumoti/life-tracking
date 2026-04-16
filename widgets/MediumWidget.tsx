@@ -5,7 +5,7 @@ import type { WidgetData } from "./shared/widgetData";
 
 type Props = { data: WidgetData };
 
-function HabitIcon({ habit }: { habit: { id: string; name: string; icon: string; completed: boolean } }) {
+function HabitIcon({ habit }: { habit: { id: string; icon: string; completed: boolean } }) {
   return (
     <FlexWidget
       style={{
@@ -23,29 +23,6 @@ function HabitIcon({ habit }: { habit: { id: string; name: string; icon: string;
       clickActionData={{ habitId: habit.id }}
     >
       <TextWidget text={habit.icon} style={{ fontSize: 20 }} />
-    </FlexWidget>
-  );
-}
-
-function StatCard({ value, label }: { value: string; label: string }) {
-  return (
-    <FlexWidget
-      style={{
-        flex: 1,
-        backgroundColor: WidgetColors.background,
-        borderRadius: 10,
-        paddingVertical: 8,
-        alignItems: "center",
-      }}
-    >
-      <TextWidget
-        text={value}
-        style={{ fontSize: 14, fontWeight: "700", color: WidgetColors.textPrimary }}
-      />
-      <TextWidget
-        text={label}
-        style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
-      />
     </FlexWidget>
   );
 }
@@ -111,11 +88,67 @@ export function MediumWidget({ data }: Props) {
         ))}
       </FlexWidget>
 
-      {/* Stats row */}
-      <FlexWidget style={{ flexDirection: "row", flexGap: 6, marginTop: 10 }}>
-        <StatCard value={`${data.stats.weeklyRunKm}km`} label="COURSE" />
-        <StatCard value={`${data.stats.weeklyWorkoutCount}`} label="SÉANCES" />
-        <StatCard value={`${data.stats.todayTaskCount}`} label="TÂCHES" />
+      {/* Stats row — larger cards */}
+      <FlexWidget style={{ flexDirection: "row", marginTop: 10, width: "match_parent" }}>
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 10,
+            marginRight: 4,
+            alignItems: "center",
+          }}
+        >
+          <TextWidget
+            text={`${data.stats.weeklyRunKm}km`}
+            style={{ fontSize: 15, fontWeight: "700", color: WidgetColors.textPrimary }}
+          />
+          <TextWidget
+            text="COURSE"
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
+          />
+        </FlexWidget>
+
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 10,
+            marginHorizontal: 4,
+            alignItems: "center",
+          }}
+        >
+          <TextWidget
+            text={`${data.stats.weeklyWorkoutCount}`}
+            style={{ fontSize: 15, fontWeight: "700", color: WidgetColors.textPrimary }}
+          />
+          <TextWidget
+            text="SÉANCES"
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
+          />
+        </FlexWidget>
+
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 10,
+            marginLeft: 4,
+            alignItems: "center",
+          }}
+        >
+          <TextWidget
+            text={`${data.stats.todayTaskCount}`}
+            style={{ fontSize: 15, fontWeight: "700", color: WidgetColors.textPrimary }}
+          />
+          <TextWidget
+            text="TÂCHES"
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
+          />
+        </FlexWidget>
       </FlexWidget>
     </FlexWidget>
   );

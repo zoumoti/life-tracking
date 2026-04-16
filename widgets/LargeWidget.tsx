@@ -10,7 +10,7 @@ function HabitIcon({ habit }: { habit: { id: string; name: string; icon: string;
     <FlexWidget
       style={{
         alignItems: "center",
-        marginRight: 10,
+        marginRight: 12,
       }}
       clickAction="TOGGLE_HABIT"
       clickActionData={{ habitId: habit.id }}
@@ -82,33 +82,6 @@ function TaskRow({ task }: { task: { title: string; completed: boolean } }) {
   );
 }
 
-function StatCard({ value, label, color }: { value: string; label: string; color?: string }) {
-  return (
-    <FlexWidget
-      style={{
-        flex: 1,
-        backgroundColor: WidgetColors.background,
-        borderRadius: 10,
-        paddingVertical: 10,
-        alignItems: "center",
-      }}
-    >
-      <TextWidget
-        text={value}
-        style={{
-          fontSize: 16,
-          fontWeight: "700",
-          color: (color || WidgetColors.textPrimary) as `#${string}`,
-        }}
-      />
-      <TextWidget
-        text={label}
-        style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
-      />
-    </FlexWidget>
-  );
-}
-
 export function LargeWidget({ data }: Props) {
   const completedCount = data.habits.filter((h) => h.completed).length;
   const totalCount = data.habits.length;
@@ -123,13 +96,9 @@ export function LargeWidget({ data }: Props) {
   const displayedTasks = data.tasks.slice(0, 3);
   const extraTasks = Math.max(0, data.tasks.length - 3);
 
-  const balanceStr = `${Math.round(data.stats.monthlyBalance)}€`;
-  const balanceColor =
-    data.stats.monthlyBalance >= 0 ? WidgetColors.success : WidgetColors.danger;
-
-  const progressPercent = data.objective
-    ? Math.min(100, Math.max(1, Math.round((data.objective.current / data.objective.target) * 100)))
-    : 0;
+  const totalBalanceStr = `${Math.round(data.stats.totalBalance)}€`;
+  const revenueStr = `+${Math.round(data.stats.monthlyRevenue)}€`;
+  const expensesStr = `-${Math.round(data.stats.monthlyExpenses)}€`;
 
   return (
     <FlexWidget
@@ -148,7 +117,7 @@ export function LargeWidget({ data }: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 16,
+          marginBottom: 14,
         }}
         clickAction="OPEN_APP"
       >
@@ -177,12 +146,12 @@ export function LargeWidget({ data }: Props) {
         </FlexWidget>
         <TextWidget
           text={dateLabel}
-          style={{ fontSize: 12, color: WidgetColors.textSecondary }}
+          style={{ fontSize: 11, color: WidgetColors.textSecondary }}
         />
       </FlexWidget>
 
       {/* Habits section */}
-      <FlexWidget style={{ marginBottom: 16 }}>
+      <FlexWidget style={{ marginBottom: 14 }}>
         <TextWidget
           text={`HABITUDES  ${completedCount}/${totalCount}`}
           style={{
@@ -201,7 +170,7 @@ export function LargeWidget({ data }: Props) {
 
       {/* Tasks section */}
       <FlexWidget
-        style={{ marginBottom: 16 }}
+        style={{ marginBottom: 14 }}
         clickAction="OPEN_APP"
         clickActionData={{ tab: "tasks" }}
       >
@@ -227,65 +196,140 @@ export function LargeWidget({ data }: Props) {
         )}
       </FlexWidget>
 
-      {/* Stats row */}
-      <FlexWidget style={{ flexDirection: "row", flexGap: 8, marginBottom: 16 }}>
-        <StatCard value={`${data.stats.weeklyRunKm}km`} label="COURSE" />
-        <StatCard value={`${data.stats.weeklyWorkoutCount}`} label="SÉANCES" />
-        <StatCard value={balanceStr} label="BALANCE" color={balanceColor} />
-      </FlexWidget>
-
-      {/* Objective card */}
-      {data.objective ? (
+      {/* Sport row — full width cards */}
+      <FlexWidget
+        style={{
+          flexDirection: "row",
+          marginBottom: 8,
+          width: "match_parent",
+        }}
+      >
         <FlexWidget
           style={{
-            backgroundColor: "rgba(212, 170, 64, 0.08)",
+            flex: 1,
+            backgroundColor: WidgetColors.background,
             borderRadius: 10,
-            padding: 12,
-            borderLeftWidth: 3,
-            borderLeftColor: WidgetColors.goldPrimary,
+            paddingVertical: 12,
+            paddingHorizontal: 12,
+            marginRight: 4,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
           }}
-          clickAction="OPEN_APP"
-          clickActionData={{ tab: "objectives" }}
         >
-          <TextWidget
-            text={`Objectif : ${data.objective.name}`}
-            style={{
-              fontSize: 12,
-              fontWeight: "600",
-              color: WidgetColors.goldDark,
-              marginBottom: 6,
-            }}
-          />
-          <FlexWidget
-            style={{
-              flexDirection: "row",
-              height: 6,
-              borderRadius: 3,
-              backgroundColor: "#EBE8E2",
-              width: "match_parent",
-              overflow: "hidden",
-            }}
-          >
-            <FlexWidget
-              style={{
-                flex: Math.max(1, progressPercent),
-                height: 6,
-                backgroundColor: WidgetColors.goldPrimary,
-                borderRadius: 3,
-              }}
+          <TextWidget text="🏃" style={{ fontSize: 16, marginRight: 8 }} />
+          <FlexWidget>
+            <TextWidget
+              text={`${data.stats.weeklyRunKm} km`}
+              style={{ fontSize: 16, fontWeight: "700", color: WidgetColors.textPrimary }}
             />
-            <FlexWidget
-              style={{ flex: Math.max(1, 100 - progressPercent), height: 6 }}
+            <TextWidget
+              text="cette semaine"
+              style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 1 }}
             />
           </FlexWidget>
+        </FlexWidget>
+
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 12,
+            paddingHorizontal: 12,
+            marginLeft: 4,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <TextWidget text="💪" style={{ fontSize: 16, marginRight: 8 }} />
+          <FlexWidget>
+            <TextWidget
+              text={`${data.stats.weeklyWorkoutCount} séance${data.stats.weeklyWorkoutCount !== 1 ? "s" : ""}`}
+              style={{ fontSize: 16, fontWeight: "700", color: WidgetColors.textPrimary }}
+            />
+            <TextWidget
+              text="cette semaine"
+              style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 1 }}
+            />
+          </FlexWidget>
+        </FlexWidget>
+      </FlexWidget>
+
+      {/* Finance row — balance prominent + revenue/expenses */}
+      <FlexWidget
+        style={{
+          flexDirection: "row",
+          width: "match_parent",
+        }}
+      >
+        {/* Solde total */}
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 12,
+            paddingHorizontal: 10,
+            marginRight: 4,
+            alignItems: "center",
+          }}
+        >
           <TextWidget
-            text={`${data.objective.current} / ${data.objective.target} ${data.objective.unit} — ${progressPercent}%`}
-            style={{ fontSize: 10, color: WidgetColors.textSecondary, marginTop: 4 }}
+            text={totalBalanceStr}
+            style={{ fontSize: 18, fontWeight: "700", color: WidgetColors.goldDark }}
+          />
+          <TextWidget
+            text="SOLDE"
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
           />
         </FlexWidget>
-      ) : (
-        <FlexWidget style={{ width: 0, height: 0 }} />
-      )}
+
+        {/* Revenus */}
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 12,
+            paddingHorizontal: 10,
+            marginHorizontal: 4,
+            alignItems: "center",
+          }}
+        >
+          <TextWidget
+            text={revenueStr}
+            style={{ fontSize: 16, fontWeight: "700", color: WidgetColors.success }}
+          />
+          <TextWidget
+            text="REVENUS"
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
+          />
+        </FlexWidget>
+
+        {/* Dépenses */}
+        <FlexWidget
+          style={{
+            flex: 1,
+            backgroundColor: WidgetColors.background,
+            borderRadius: 10,
+            paddingVertical: 12,
+            paddingHorizontal: 10,
+            marginLeft: 4,
+            alignItems: "center",
+          }}
+        >
+          <TextWidget
+            text={expensesStr}
+            style={{ fontSize: 16, fontWeight: "700", color: WidgetColors.danger }}
+          />
+          <TextWidget
+            text="DÉPENSES"
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
+          />
+        </FlexWidget>
+      </FlexWidget>
     </FlexWidget>
   );
 }

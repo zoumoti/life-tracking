@@ -20,6 +20,9 @@ export type WidgetStats = {
   weeklyWorkoutCount: number;
   todayTaskCount: number;
   monthlyBalance: number;
+  totalBalance: number;
+  monthlyExpenses: number;
+  monthlyRevenue: number;
 };
 
 export type WidgetObjective = {
@@ -46,6 +49,9 @@ const DEFAULT_DATA: WidgetData = {
     weeklyWorkoutCount: 0,
     todayTaskCount: 0,
     monthlyBalance: 0,
+    totalBalance: 0,
+    monthlyExpenses: 0,
+    monthlyRevenue: 0,
   },
   objective: null,
   lastUpdated: new Date().toISOString(),

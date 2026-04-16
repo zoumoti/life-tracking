@@ -192,10 +192,26 @@ async function buildWidgetData(): Promise<WidgetData> {
 
   const todayTaskCount = todayTasks.filter((t) => !t.completed).length;
 
-  const monthlyBalance = financeState.accounts.reduce(
+  const totalBalance = financeState.accounts.reduce(
     (sum, a) => sum + (a.balance || 0),
     0
   );
+  const monthlyBalance = totalBalance;
+
+  // Monthly finance stats
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+  const monthTransactions = financeState.transactions.filter((t) => {
+    const d = new Date(t.date);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+  const monthlyExpenses = monthTransactions
+    .filter((t) => t.type === "expense")
+    .reduce((sum, t) => sum + t.amount, 0);
+  const monthlyRevenue = monthTransactions
+    .filter((t) => t.type === "income")
+    .reduce((sum, t) => sum + t.amount, 0);
 
   const activeObjectives = objectiveState.objectives.filter((o) => o.is_active);
   const topObjective = activeObjectives[0] || null;
@@ -213,7 +229,7 @@ async function buildWidgetData(): Promise<WidgetData> {
   return {
     habits,
     tasks,
-    stats: { weeklyRunKm, weeklyWorkoutCount, todayTaskCount, monthlyBalance },
+    stats: { weeklyRunKm, weeklyWorkoutCount, todayTaskCount, monthlyBalance, totalBalance, monthlyExpenses, monthlyRevenue },
     objective,
     lastUpdated: new Date().toISOString(),
   };
