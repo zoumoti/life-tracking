@@ -143,6 +143,22 @@ Deno.serve(async () => {
       totalVolume = sets?.reduce((s, set) => s + set.weight_kg * set.reps, 0) ?? 0;
     }
 
+    // ─── Finances ───
+    const { data: transactions } = await supabase
+      .from("transactions")
+      .select("type, amount")
+      .eq("user_id", userId)
+      .gte("date", start)
+      .lte("date", end);
+
+    const weekRevenue = transactions
+      ?.filter((t) => t.type === "income")
+      .reduce((s, t) => s + t.amount, 0) ?? 0;
+    const weekExpenses = transactions
+      ?.filter((t) => t.type === "expense")
+      .reduce((s, t) => s + t.amount, 0) ?? 0;
+    const weekBalance = weekRevenue - weekExpenses;
+
     // ─── Objectives ───
     const { data: objectives } = await supabase
       .from("objectives")
@@ -169,6 +185,11 @@ ${habitDetails}
 
 💪 <b>Musculation</b>
   ${totalSessions} séance${totalSessions !== 1 ? "s" : ""}${totalVolume > 0 ? ` — ${Math.round(totalVolume)} kg de volume` : ""}
+
+💰 <b>Finances</b>
+  📈 Revenus: +${Math.round(weekRevenue)}€
+  📉 Dépenses: -${Math.round(weekExpenses)}€
+  ${weekBalance >= 0 ? "✅" : "⚠️"} Bilan: ${weekBalance >= 0 ? "+" : ""}${Math.round(weekBalance)}€
 
 🎯 <b>Objectifs</b>
 ${objectiveDetails || "  Aucun objectif actif"}
