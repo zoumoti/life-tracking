@@ -47,8 +47,8 @@ function TaskRow({ task }: { task: { title: string; completed: boolean } }) {
         backgroundColor: WidgetColors.background,
         borderRadius: 8,
         paddingHorizontal: 10,
-        paddingVertical: 8,
-        marginBottom: 4,
+        paddingVertical: 6,
+        marginBottom: 3,
       }}
     >
       <FlexWidget
@@ -106,7 +106,7 @@ export function LargeWidget({ data }: Props) {
         flexDirection: "column",
         backgroundColor: WidgetColors.surface,
         borderRadius: 14,
-        padding: 16,
+        padding: 14,
         height: "match_parent",
         width: "match_parent",
       }}
@@ -117,7 +117,7 @@ export function LargeWidget({ data }: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 14,
+          marginBottom: 10,
         }}
         clickAction="OPEN_APP"
       >
@@ -158,7 +158,7 @@ export function LargeWidget({ data }: Props) {
             fontSize: 10,
             fontWeight: "600",
             color: WidgetColors.goldPrimary,
-            marginBottom: 8,
+            marginBottom: 6,
           }}
         />
         <FlexWidget style={{ flexDirection: "row" }}>
@@ -180,7 +180,7 @@ export function LargeWidget({ data }: Props) {
             fontSize: 10,
             fontWeight: "600",
             color: WidgetColors.goldDark,
-            marginBottom: 8,
+            marginBottom: 6,
           }}
         />
         {displayedTasks.map((task) => (
@@ -200,7 +200,7 @@ export function LargeWidget({ data }: Props) {
       <FlexWidget
         style={{
           flexDirection: "row",
-          marginBottom: 8,
+          marginBottom: 6,
           width: "match_parent",
         }}
       >
@@ -209,7 +209,7 @@ export function LargeWidget({ data }: Props) {
             flex: 1,
             backgroundColor: WidgetColors.background,
             borderRadius: 10,
-            paddingVertical: 12,
+            paddingVertical: 10,
             paddingHorizontal: 12,
             marginRight: 4,
             flexDirection: "row",
@@ -235,7 +235,7 @@ export function LargeWidget({ data }: Props) {
             flex: 1,
             backgroundColor: WidgetColors.background,
             borderRadius: 10,
-            paddingVertical: 12,
+            paddingVertical: 10,
             paddingHorizontal: 12,
             marginLeft: 4,
             flexDirection: "row",
@@ -270,7 +270,7 @@ export function LargeWidget({ data }: Props) {
             flex: 1,
             backgroundColor: WidgetColors.background,
             borderRadius: 10,
-            paddingVertical: 12,
+            paddingVertical: 10,
             paddingHorizontal: 10,
             marginRight: 4,
             alignItems: "center",
@@ -292,7 +292,7 @@ export function LargeWidget({ data }: Props) {
             flex: 1,
             backgroundColor: WidgetColors.background,
             borderRadius: 10,
-            paddingVertical: 12,
+            paddingVertical: 10,
             paddingHorizontal: 10,
             marginHorizontal: 4,
             alignItems: "center",
@@ -314,7 +314,7 @@ export function LargeWidget({ data }: Props) {
             flex: 1,
             backgroundColor: WidgetColors.background,
             borderRadius: 10,
-            paddingVertical: 12,
+            paddingVertical: 10,
             paddingHorizontal: 10,
             marginLeft: 4,
             alignItems: "center",
