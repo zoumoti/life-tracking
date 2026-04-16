@@ -6,6 +6,7 @@ import { Card } from "../../components/ui/Card";
 import { ConfirmModal } from "../../components/ui/ConfirmModal";
 import { HabitStats } from "../../components/habits/HabitStats";
 import { StreakChart } from "../../components/habits/StreakChart";
+import { CompletionTrend } from "../../components/habits/CompletionTrend";
 import { MonthView } from "../../components/habits/MonthView";
 import { useHabitStore } from "../../stores/habitStore";
 import { toDateString, addDays, MONTH_LABELS } from "../../lib/dateUtils";
@@ -19,6 +20,7 @@ export default function HabitDetailScreen() {
   const { habits, completions, deleteHabit, getCompletedDatesForHabit, fetchCompletions } =
     useHabitStore();
   const [showDelete, setShowDelete] = useState(false);
+  const [showMenu, setShowMenu] = useState(false);
   const [monthYear, setMonthYear] = useState(() => {
     const now = new Date();
     return { year: now.getFullYear(), month: now.getMonth() };
@@ -27,7 +29,6 @@ export default function HabitDetailScreen() {
   const habit = habits.find((h) => h.id === id);
   const today = toDateString();
 
-  // Fetch extended completions for this habit (1 year)
   useEffect(() => {
     if (id) {
       fetchCompletions(addDays(today, -365), today);
@@ -85,9 +86,43 @@ export default function HabitDetailScreen() {
           headerStyle: { backgroundColor: c.background },
           headerTintColor: c.text,
           headerShadowVisible: false,
+          headerRight: () => (
+            <Pressable onPress={() => setShowMenu((v) => !v)} className="p-2">
+              <Feather name="more-vertical" size={22} color={c.text} />
+            </Pressable>
+          ),
         }}
       />
       <ScrollView className="flex-1 px-4 pt-4" style={{ backgroundColor: c.background }}>
+        {/* Dropdown menu */}
+        {showMenu && (
+          <View
+            className="absolute right-4 top-0 z-50 rounded-xl py-2 px-1"
+            style={{ backgroundColor: c.surface, elevation: 8 }}
+          >
+            <Pressable
+              onPress={() => {
+                setShowMenu(false);
+                router.push({ pathname: "/habit/edit", params: { id } });
+              }}
+              className="flex-row items-center px-4 py-3"
+            >
+              <Feather name="edit-2" size={16} color={c.text} />
+              <Text className="ml-3 text-sm" style={{ color: c.text }}>Modifier</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => {
+                setShowMenu(false);
+                setShowDelete(true);
+              }}
+              className="flex-row items-center px-4 py-3"
+            >
+              <Feather name="trash-2" size={16} color={c.danger} />
+              <Text className="ml-3 text-sm" style={{ color: c.danger }}>Supprimer</Text>
+            </Pressable>
+          </View>
+        )}
+
         {/* Header */}
         <View className="flex-row items-center mb-6">
           <View
@@ -137,8 +172,13 @@ export default function HabitDetailScreen() {
           <StreakChart habit={habit} completedDates={completedDates} days={30} />
         </Card>
 
+        {/* Completion Trend */}
+        <Card className="mt-4">
+          <CompletionTrend habit={habit} completedDates={completedDates} />
+        </Card>
+
         {/* Calendar History */}
-        <Card className="mt-4 mb-4">
+        <Card className="mt-4 mb-8">
           <Text className="font-bold text-base mb-3" style={{ color: c.text }}>Historique</Text>
           <MonthView
             habits={[habit]}
@@ -148,17 +188,6 @@ export default function HabitDetailScreen() {
             onChangeMonth={handleChangeMonth}
           />
         </Card>
-
-        {/* Delete button */}
-        <Pressable
-          onPress={() => setShowDelete(true)}
-          className="flex-row items-center justify-center py-4 mb-8"
-        >
-          <Feather name="trash-2" size={18} color={c.danger} />
-          <Text className="ml-2 font-semibold" style={{ color: c.danger }}>
-            Supprimer cette habitude
-          </Text>
-        </Pressable>
       </ScrollView>
 
       <ConfirmModal
