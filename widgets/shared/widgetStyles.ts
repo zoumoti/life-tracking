@@ -11,7 +11,7 @@ export const WidgetColors = {
   goldPrimary: "#D4AA40",
   goldDark: "#B8922E",
   success: "#22c55e",
-  successLight: "rgba(34,197,94,0.1)",
+  successLight: "rgba(34, 197, 94, 0.1)",
   danger: "#ef4444",
 } as const;
 
