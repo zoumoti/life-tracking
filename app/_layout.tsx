@@ -9,11 +9,7 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useAuthStore } from "../stores/authStore";
 import { useColors } from "../lib/theme";
 import { useThemeStore } from "../stores/themeStore";
-import { registerWidgetTaskHandler } from "react-native-android-widget";
-import { widgetTaskHandler } from "../widgets/WidgetTaskHandler";
 import { syncWidgetData } from "../widgets/shared/widgetSync";
-
-registerWidgetTaskHandler(widgetTaskHandler);
 
 export default function RootLayout() {
   const { initialize, loading, session } = useAuthStore();
