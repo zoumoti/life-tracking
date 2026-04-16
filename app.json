@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "life-tracker",
+    "name": "Life OS",
     "slug": "life-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "lifetracker",
+    "scheme": "lifeos",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -17,7 +17,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "com.zoumoti.lifetracker",
+      "package": "com.zoumoti.lifeos",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#121210"
@@ -36,6 +36,47 @@
         "@react-native-google-signin/google-signin",
         {
           "iosUrlScheme": "com.googleusercontent.apps.1063289815690-6eggvslg2kn9buvbqa3fc95io2qmn0gp"
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/icon.png",
+          "color": "#D4AA40"
+        }
+      ],
+      [
+        "react-native-android-widget",
+        {
+          "widgets": [
+            {
+              "name": "LifeOSSmall",
+              "label": "Life OS - Résumé",
+              "minWidth": "250dp",
+              "minHeight": "50dp",
+              "description": "Résumé rapide: habitudes, tâches, sport",
+              "updatePeriodMillis": 1800000
+            },
+            {
+              "name": "LifeOSMedium",
+              "label": "Life OS - Habitudes",
+              "minWidth": "250dp",
+              "minHeight": "110dp",
+              "description": "Habitudes interactives + stats semaine",
+              "updatePeriodMillis": 1800000,
+              "resizeMode": "horizontal|vertical"
+            },
+            {
+              "name": "LifeOSLarge",
+              "label": "Life OS - Dashboard",
+              "minWidth": "250dp",
+              "minHeight": "250dp",
+              "description": "Dashboard complet: habitudes, tâches, sport, finances, objectifs",
+              "updatePeriodMillis": 1800000,
+              "resizeMode": "horizontal|vertical"
+            }
+          ]
         }
       ]
     ],
