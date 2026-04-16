@@ -17,85 +17,74 @@ export function SmallWidget({ data }: Props) {
         justifyContent: "space-between",
         backgroundColor: WidgetColors.surface,
         borderRadius: WidgetRadius.card,
-        paddingHorizontal: WidgetSpacing.lg,
-        paddingVertical: WidgetSpacing.md,
+        paddingHorizontal: 20,
+        paddingVertical: 14,
         height: "match_parent",
         width: "match_parent",
       }}
       clickAction="OPEN_APP"
     >
+      {/* Logo + Title */}
       <FlexWidget style={{ flexDirection: "row", alignItems: "center" }}>
         <FlexWidget
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: WidgetRadius.icon,
+            width: 32,
+            height: 32,
+            borderRadius: 10,
             backgroundColor: WidgetColors.goldPrimary,
             justifyContent: "center",
             alignItems: "center",
           }}
         >
-          <TextWidget text="🎯" style={{ fontSize: 14 }} />
+          <TextWidget text="🎯" style={{ fontSize: 16 }} />
         </FlexWidget>
         <TextWidget
           text="Life OS"
           style={{
-            fontSize: WidgetFontSize.md,
+            fontSize: 16,
+            fontWeight: "600",
             color: WidgetColors.textPrimary,
-            marginLeft: WidgetSpacing.sm,
+            marginLeft: 10,
           }}
         />
       </FlexWidget>
 
+      {/* Stats */}
       <FlexWidget style={{ flexDirection: "row", alignItems: "center" }}>
-        <FlexWidget style={{ alignItems: "center" }}>
+        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 12 }}>
           <TextWidget
             text={`${completedCount}/${totalCount}`}
-            style={{ fontSize: WidgetFontSize.lg, color: WidgetColors.goldPrimary }}
+            style={{ fontSize: 17, fontWeight: "700", color: WidgetColors.goldPrimary }}
           />
           <TextWidget
             text="Habitudes"
-            style={{ fontSize: WidgetFontSize.xs, color: WidgetColors.textSecondary }}
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
           />
         </FlexWidget>
 
-        <FlexWidget
-          style={{
-            width: 1,
-            height: 24,
-            backgroundColor: WidgetColors.border,
-            marginHorizontal: WidgetSpacing.md,
-          }}
-        />
+        <FlexWidget style={{ width: 1, height: 28, backgroundColor: WidgetColors.border }} />
 
-        <FlexWidget style={{ alignItems: "center" }}>
+        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 12 }}>
           <TextWidget
             text={`${data.stats.todayTaskCount}`}
-            style={{ fontSize: WidgetFontSize.lg, color: WidgetColors.textPrimary }}
+            style={{ fontSize: 17, fontWeight: "700", color: WidgetColors.textPrimary }}
           />
           <TextWidget
             text="Tâches"
-            style={{ fontSize: WidgetFontSize.xs, color: WidgetColors.textSecondary }}
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
           />
         </FlexWidget>
 
-        <FlexWidget
-          style={{
-            width: 1,
-            height: 24,
-            backgroundColor: WidgetColors.border,
-            marginHorizontal: WidgetSpacing.md,
-          }}
-        />
+        <FlexWidget style={{ width: 1, height: 28, backgroundColor: WidgetColors.border }} />
 
-        <FlexWidget style={{ alignItems: "center" }}>
+        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 12 }}>
           <TextWidget
             text={`${data.stats.weeklyRunKm}km`}
-            style={{ fontSize: WidgetFontSize.lg, color: WidgetColors.textPrimary }}
+            style={{ fontSize: 17, fontWeight: "700", color: WidgetColors.textPrimary }}
           />
           <TextWidget
             text="Semaine"
-            style={{ fontSize: WidgetFontSize.xs, color: WidgetColors.textSecondary }}
+            style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
           />
         </FlexWidget>
       </FlexWidget>

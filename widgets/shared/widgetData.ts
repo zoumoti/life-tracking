@@ -1,8 +1,6 @@
-// widgets/shared/widgetData.ts
-import SharedGroupPreferences from "react-native-shared-group-preferences";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const WIDGET_KEY = "lifeos_widget_data";
-const GROUP_ID = "group.com.zoumoti.lifeos";
+const WIDGET_KEY = "@lifeos_widget_data";
 
 export type WidgetHabit = {
   id: string;
@@ -43,14 +41,19 @@ export type WidgetData = {
 const DEFAULT_DATA: WidgetData = {
   habits: [],
   tasks: [],
-  stats: { weeklyRunKm: 0, weeklyWorkoutCount: 0, todayTaskCount: 0, monthlyBalance: 0 },
+  stats: {
+    weeklyRunKm: 0,
+    weeklyWorkoutCount: 0,
+    todayTaskCount: 0,
+    monthlyBalance: 0,
+  },
   objective: null,
   lastUpdated: new Date().toISOString(),
 };
 
 export async function readWidgetData(): Promise<WidgetData> {
   try {
-    const raw = await SharedGroupPreferences.getItem(WIDGET_KEY, GROUP_ID);
+    const raw = await AsyncStorage.getItem(WIDGET_KEY);
     if (!raw) return DEFAULT_DATA;
     return JSON.parse(raw) as WidgetData;
   } catch {
@@ -60,7 +63,7 @@ export async function readWidgetData(): Promise<WidgetData> {
 
 export async function writeWidgetData(data: WidgetData): Promise<void> {
   try {
-    await SharedGroupPreferences.setItem(WIDGET_KEY, JSON.stringify(data), GROUP_ID);
+    await AsyncStorage.setItem(WIDGET_KEY, JSON.stringify(data));
   } catch {
     // Silent fail — widget will show stale data
   }

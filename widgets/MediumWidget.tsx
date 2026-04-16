@@ -9,21 +9,20 @@ function HabitIcon({ habit }: { habit: { id: string; icon: string; completed: bo
   return (
     <FlexWidget
       style={{
-        width: 38,
-        height: 38,
-        borderRadius: WidgetRadius.element,
-        backgroundColor: habit.completed ? "rgba(34, 197, 94, 0.1)" : WidgetColors.background,
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: habit.completed ? "rgba(34, 197, 94, 0.12)" : WidgetColors.background,
         borderWidth: 2,
         borderColor: habit.completed ? WidgetColors.success : WidgetColors.border,
         justifyContent: "center",
         alignItems: "center",
-        marginRight: WidgetSpacing.sm,
-        marginBottom: WidgetSpacing.xs,
+        marginRight: 8,
       }}
       clickAction="TOGGLE_HABIT"
       clickActionData={{ habitId: habit.id }}
     >
-      <TextWidget text={habit.completed ? "✅" : habit.icon} style={{ fontSize: 15 }} />
+      <TextWidget text={habit.completed ? "✅" : habit.icon} style={{ fontSize: 16 }} />
     </FlexWidget>
   );
 }
@@ -34,13 +33,19 @@ function StatCard({ value, label }: { value: string; label: string }) {
       style={{
         flex: 1,
         backgroundColor: WidgetColors.background,
-        borderRadius: WidgetRadius.element,
-        paddingVertical: WidgetSpacing.sm,
+        borderRadius: 10,
+        paddingVertical: 8,
         alignItems: "center",
       }}
     >
-      <TextWidget text={value} style={{ fontSize: WidgetFontSize.lg, color: WidgetColors.textPrimary }} />
-      <TextWidget text={label} style={{ fontSize: WidgetFontSize.xs, color: WidgetColors.textSecondary }} />
+      <TextWidget
+        text={value}
+        style={{ fontSize: 15, fontWeight: "700", color: WidgetColors.textPrimary }}
+      />
+      <TextWidget
+        text={label}
+        style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
+      />
     </FlexWidget>
   );
 }
@@ -53,9 +58,10 @@ export function MediumWidget({ data }: Props) {
     <FlexWidget
       style={{
         flexDirection: "column",
+        justifyContent: "space-between",
         backgroundColor: WidgetColors.surface,
         borderRadius: WidgetRadius.card,
-        padding: WidgetSpacing.lg,
+        padding: 16,
         height: "match_parent",
         width: "match_parent",
       }}
@@ -66,52 +72,47 @@ export function MediumWidget({ data }: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: WidgetSpacing.md,
         }}
         clickAction="OPEN_APP"
       >
         <FlexWidget style={{ flexDirection: "row", alignItems: "center" }}>
           <FlexWidget
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 7,
+              width: 28,
+              height: 28,
+              borderRadius: 8,
               backgroundColor: WidgetColors.goldPrimary,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <TextWidget text="🎯" style={{ fontSize: 12 }} />
+            <TextWidget text="🎯" style={{ fontSize: 14 }} />
           </FlexWidget>
           <TextWidget
             text="Life OS"
             style={{
-              fontSize: WidgetFontSize.lg,
+              fontSize: 16,
+              fontWeight: "600",
               color: WidgetColors.textPrimary,
-              marginLeft: WidgetSpacing.sm,
+              marginLeft: 10,
             }}
           />
         </FlexWidget>
         <TextWidget
           text={`${completedCount}/${totalCount}`}
-          style={{ fontSize: WidgetFontSize.sm, color: WidgetColors.goldPrimary }}
+          style={{ fontSize: 13, fontWeight: "600", color: WidgetColors.goldPrimary }}
         />
       </FlexWidget>
 
-      {/* Habits row — no flexWrap, just a horizontal row */}
-      <FlexWidget
-        style={{
-          flexDirection: "row",
-          marginBottom: WidgetSpacing.md,
-        }}
-      >
+      {/* Habits row */}
+      <FlexWidget style={{ flexDirection: "row", marginTop: 12 }}>
         {data.habits.map((habit) => (
           <HabitIcon key={habit.id} habit={habit} />
         ))}
       </FlexWidget>
 
-      {/* Stats row — use flexGap instead of gap */}
-      <FlexWidget style={{ flexDirection: "row", flexGap: WidgetSpacing.sm }}>
+      {/* Stats row */}
+      <FlexWidget style={{ flexDirection: "row", flexGap: 8, marginTop: 12 }}>
         <StatCard value={`${data.stats.weeklyRunKm}km`} label="COURSE" />
         <StatCard value={`${data.stats.weeklyWorkoutCount}`} label="SÉANCES" />
         <StatCard value={`${data.stats.todayTaskCount}`} label="TÂCHES" />

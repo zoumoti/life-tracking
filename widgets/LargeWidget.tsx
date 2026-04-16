@@ -9,21 +9,20 @@ function HabitIcon({ habit }: { habit: { id: string; icon: string; completed: bo
   return (
     <FlexWidget
       style={{
-        width: 38,
-        height: 38,
-        borderRadius: WidgetRadius.element,
-        backgroundColor: habit.completed ? "rgba(34, 197, 94, 0.1)" : WidgetColors.background,
+        width: 40,
+        height: 40,
+        borderRadius: 12,
+        backgroundColor: habit.completed ? "rgba(34, 197, 94, 0.12)" : WidgetColors.background,
         borderWidth: 2,
         borderColor: habit.completed ? WidgetColors.success : WidgetColors.border,
         justifyContent: "center",
         alignItems: "center",
-        marginRight: 7,
-        marginBottom: WidgetSpacing.xs,
+        marginRight: 8,
       }}
       clickAction="TOGGLE_HABIT"
       clickActionData={{ habitId: habit.id }}
     >
-      <TextWidget text={habit.completed ? "✅" : habit.icon} style={{ fontSize: 15 }} />
+      <TextWidget text={habit.completed ? "✅" : habit.icon} style={{ fontSize: 16 }} />
     </FlexWidget>
   );
 }
@@ -35,17 +34,17 @@ function TaskRow({ task }: { task: { title: string; completed: boolean } }) {
         flexDirection: "row",
         alignItems: "center",
         backgroundColor: WidgetColors.background,
-        borderRadius: WidgetRadius.icon,
-        paddingHorizontal: WidgetSpacing.md,
-        paddingVertical: 6,
-        marginBottom: WidgetSpacing.xs,
+        borderRadius: 8,
+        paddingHorizontal: 10,
+        paddingVertical: 8,
+        marginBottom: 4,
       }}
     >
       <FlexWidget
         style={{
-          width: 16,
-          height: 16,
-          borderRadius: 4,
+          width: 18,
+          height: 18,
+          borderRadius: 5,
           backgroundColor: task.completed ? WidgetColors.success : "#00000000",
           borderWidth: task.completed ? 0 : 2,
           borderColor: WidgetColors.border,
@@ -55,15 +54,15 @@ function TaskRow({ task }: { task: { title: string; completed: boolean } }) {
       >
         <TextWidget
           text={task.completed ? "✓" : ""}
-          style={{ fontSize: 10, color: "#FFFFFF" }}
+          style={{ fontSize: 11, fontWeight: "bold", color: "#FFFFFF" }}
         />
       </FlexWidget>
       <TextWidget
         text={task.title}
         style={{
-          fontSize: 12,
+          fontSize: 13,
           color: task.completed ? WidgetColors.textMuted : WidgetColors.textPrimary,
-          marginLeft: WidgetSpacing.sm,
+          marginLeft: 10,
         }}
         truncate="END"
         maxLines={1}
@@ -78,18 +77,22 @@ function StatCard({ value, label, color }: { value: string; label: string; color
       style={{
         flex: 1,
         backgroundColor: WidgetColors.background,
-        borderRadius: WidgetRadius.element,
-        paddingVertical: WidgetSpacing.sm,
+        borderRadius: 10,
+        paddingVertical: 10,
         alignItems: "center",
       }}
     >
       <TextWidget
         text={value}
-        style={{ fontSize: 16, color: (color || WidgetColors.textPrimary) as `#${string}` }}
+        style={{
+          fontSize: 16,
+          fontWeight: "700",
+          color: (color || WidgetColors.textPrimary) as `#${string}`,
+        }}
       />
       <TextWidget
         text={label}
-        style={{ fontSize: WidgetFontSize.xs, color: WidgetColors.textSecondary }}
+        style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 2 }}
       />
     </FlexWidget>
   );
@@ -110,14 +113,12 @@ export function LargeWidget({ data }: Props) {
   const extraTasks = Math.max(0, data.tasks.length - 3);
 
   const balanceStr = `${Math.round(data.stats.monthlyBalance)}€`;
-  const balanceColor = data.stats.monthlyBalance >= 0 ? WidgetColors.success : WidgetColors.danger;
+  const balanceColor =
+    data.stats.monthlyBalance >= 0 ? WidgetColors.success : WidgetColors.danger;
 
-  // Progress bar: use flex ratio instead of percentage width
   const progressPercent = data.objective
     ? Math.min(100, Math.max(1, Math.round((data.objective.current / data.objective.target) * 100)))
     : 0;
-  const progressFlex = Math.max(1, progressPercent);
-  const remainingFlex = Math.max(1, 100 - progressPercent);
 
   return (
     <FlexWidget
@@ -125,7 +126,7 @@ export function LargeWidget({ data }: Props) {
         flexDirection: "column",
         backgroundColor: WidgetColors.surface,
         borderRadius: WidgetRadius.card,
-        padding: WidgetSpacing.lg,
+        padding: 16,
         height: "match_parent",
         width: "match_parent",
       }}
@@ -136,43 +137,49 @@ export function LargeWidget({ data }: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: WidgetSpacing.md,
+          marginBottom: 14,
         }}
         clickAction="OPEN_APP"
       >
         <FlexWidget style={{ flexDirection: "row", alignItems: "center" }}>
           <FlexWidget
             style={{
-              width: 24,
-              height: 24,
-              borderRadius: 7,
+              width: 28,
+              height: 28,
+              borderRadius: 8,
               backgroundColor: WidgetColors.goldPrimary,
               justifyContent: "center",
               alignItems: "center",
             }}
           >
-            <TextWidget text="🎯" style={{ fontSize: 12 }} />
+            <TextWidget text="🎯" style={{ fontSize: 14 }} />
           </FlexWidget>
           <TextWidget
             text="Life OS"
             style={{
-              fontSize: WidgetFontSize.lg,
+              fontSize: 16,
+              fontWeight: "600",
               color: WidgetColors.textPrimary,
-              marginLeft: WidgetSpacing.sm,
+              marginLeft: 10,
             }}
           />
         </FlexWidget>
         <TextWidget
           text={dateLabel}
-          style={{ fontSize: WidgetFontSize.sm, color: WidgetColors.textSecondary }}
+          style={{ fontSize: 12, color: WidgetColors.textSecondary }}
         />
       </FlexWidget>
 
       {/* Habits section */}
-      <FlexWidget style={{ marginBottom: WidgetSpacing.md }}>
+      <FlexWidget style={{ marginBottom: 14 }}>
         <TextWidget
           text={`HABITUDES — ${completedCount}/${totalCount}`}
-          style={{ fontSize: 10, color: WidgetColors.goldPrimary, marginBottom: 6 }}
+          style={{
+            fontSize: 10,
+            fontWeight: "600",
+            color: WidgetColors.goldPrimary,
+            marginBottom: 8,
+          }}
         />
         <FlexWidget style={{ flexDirection: "row" }}>
           {data.habits.map((habit) => (
@@ -183,36 +190,35 @@ export function LargeWidget({ data }: Props) {
 
       {/* Tasks section */}
       <FlexWidget
-        style={{ marginBottom: WidgetSpacing.md }}
+        style={{ marginBottom: 14 }}
         clickAction="OPEN_APP"
         clickActionData={{ tab: "tasks" }}
       >
         <TextWidget
           text="TÂCHES DU JOUR"
-          style={{ fontSize: 10, color: WidgetColors.goldDark, marginBottom: 6 }}
+          style={{
+            fontSize: 10,
+            fontWeight: "600",
+            color: WidgetColors.goldDark,
+            marginBottom: 8,
+          }}
         />
         {displayedTasks.map((task) => (
           <TaskRow key={task.id} task={task} />
         ))}
-        {extraTasks > 0 && (
+        {extraTasks > 0 ? (
           <TextWidget
             text={`+${extraTasks} de plus`}
-            style={{
-              fontSize: WidgetFontSize.xs,
-              color: WidgetColors.textMuted,
-              marginTop: WidgetSpacing.xs,
-            }}
+            style={{ fontSize: 10, color: WidgetColors.textMuted, marginTop: 4 }}
           />
+        ) : (
+          <FlexWidget style={{ width: 0, height: 0 }} />
         )}
       </FlexWidget>
 
       {/* Stats row */}
       <FlexWidget
-        style={{
-          flexDirection: "row",
-          flexGap: WidgetSpacing.sm,
-          marginBottom: WidgetSpacing.md,
-        }}
+        style={{ flexDirection: "row", flexGap: 8, marginBottom: 14 }}
       >
         <StatCard value={`${data.stats.weeklyRunKm}km`} label="COURSE" />
         <StatCard value={`${data.stats.weeklyWorkoutCount}`} label="SÉANCES" />
@@ -224,8 +230,8 @@ export function LargeWidget({ data }: Props) {
         <FlexWidget
           style={{
             backgroundColor: "rgba(212, 170, 64, 0.08)",
-            borderRadius: WidgetRadius.element,
-            padding: WidgetSpacing.md,
+            borderRadius: 10,
+            padding: 12,
             borderLeftWidth: 3,
             borderLeftColor: WidgetColors.goldPrimary,
           }}
@@ -235,9 +241,10 @@ export function LargeWidget({ data }: Props) {
           <TextWidget
             text={`Objectif : ${data.objective.name}`}
             style={{
-              fontSize: WidgetFontSize.sm,
+              fontSize: 12,
+              fontWeight: "600",
               color: WidgetColors.goldDark,
-              marginBottom: 5,
+              marginBottom: 6,
             }}
           />
           {/* Progress bar using flex ratio */}
@@ -245,7 +252,7 @@ export function LargeWidget({ data }: Props) {
             style={{
               flexDirection: "row",
               height: 6,
-              borderRadius: 4,
+              borderRadius: 3,
               backgroundColor: "#EBE8E2",
               width: "match_parent",
               overflow: "hidden",
@@ -253,25 +260,23 @@ export function LargeWidget({ data }: Props) {
           >
             <FlexWidget
               style={{
-                flex: progressFlex,
+                flex: Math.max(1, progressPercent),
                 height: 6,
                 backgroundColor: WidgetColors.goldPrimary,
-                borderRadius: 4,
+                borderRadius: 3,
               }}
             />
-            <FlexWidget style={{ flex: remainingFlex, height: 6 }} />
+            <FlexWidget
+              style={{ flex: Math.max(1, 100 - progressPercent), height: 6 }}
+            />
           </FlexWidget>
           <TextWidget
             text={`${data.objective.current} / ${data.objective.target} ${data.objective.unit} — ${progressPercent}%`}
-            style={{
-              fontSize: WidgetFontSize.xs,
-              color: WidgetColors.textSecondary,
-              marginTop: WidgetSpacing.xs,
-            }}
+            style={{ fontSize: 10, color: WidgetColors.textSecondary, marginTop: 4 }}
           />
         </FlexWidget>
       ) : (
-        <FlexWidget style={{ height: 0, width: 0 }} />
+        <FlexWidget style={{ width: 0, height: 0 }} />
       )}
     </FlexWidget>
   );
