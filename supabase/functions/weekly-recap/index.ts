@@ -19,7 +19,6 @@ async function sendTelegram(text: string) {
 
 function getWeekRange(): { start: string; end: string } {
   const now = new Date();
-  // Last week: Monday to Sunday
   const dayOfWeek = now.getDay();
   const daysToLastMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   const lastMonday = new Date(now);
@@ -31,7 +30,23 @@ function getWeekRange(): { start: string; end: string } {
   return { start: fmt(lastMonday), end: fmt(lastSunday) };
 }
 
-Deno.serve(async (req) => {
+/** How many days per week this habit is scheduled */
+function getExpectedDaysPerWeek(habit: {
+  frequency_type: string;
+  frequency_days: number[] | null;
+  x_per_week: number | null;
+}): number {
+  if (habit.frequency_type === "daily") return 7;
+  if (habit.frequency_type === "specific_days" && habit.frequency_days) {
+    return habit.frequency_days.length;
+  }
+  if (habit.frequency_type === "x_per_week" && habit.x_per_week) {
+    return habit.x_per_week;
+  }
+  return 7;
+}
+
+Deno.serve(async () => {
   try {
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
     const { start, end } = getWeekRange();
@@ -46,7 +61,7 @@ Deno.serve(async (req) => {
     // ─── Habits ───
     const { data: habits } = await supabase
       .from("habits")
-      .select("id, name")
+      .select("id, name, frequency_type, frequency_days, x_per_week")
       .eq("user_id", userId)
       .is("archived_at", null);
 
@@ -57,22 +72,29 @@ Deno.serve(async (req) => {
       .gte("completed_date", start)
       .lte("completed_date", end);
 
-    const totalHabits = habits?.length ?? 0;
     const completionsByHabit: Record<string, number> = {};
     completions?.forEach((c) => {
       completionsByHabit[c.habit_id] = (completionsByHabit[c.habit_id] || 0) + 1;
     });
 
-    const totalCompletions = completions?.length ?? 0;
-    const maxPossible = totalHabits * 7;
-    const habitRate = maxPossible > 0 ? Math.round((totalCompletions / maxPossible) * 100) : 0;
-
+    let totalCompleted = 0;
+    let totalExpected = 0;
     let habitDetails = "";
+
     habits?.forEach((h) => {
       const count = completionsByHabit[h.id] || 0;
-      const emoji = count >= 6 ? "🔥" : count >= 4 ? "✅" : count >= 1 ? "⚠️" : "❌";
-      habitDetails += `  ${emoji} ${h.name}: ${count}/7\n`;
+      const expected = getExpectedDaysPerWeek(h);
+      totalCompleted += count;
+      totalExpected += expected;
+
+      const pct = expected > 0 ? Math.round((count / expected) * 100) : 0;
+      const emoji = pct >= 85 ? "🔥" : pct >= 50 ? "✅" : pct >= 1 ? "⚠️" : "❌";
+      habitDetails += `  ${emoji} ${h.name}: ${count}/${expected}`;
+      if (expected < 7) habitDetails += ` (${expected}j/sem)`;
+      habitDetails += "\n";
     });
+
+    const habitRate = totalExpected > 0 ? Math.round((totalCompleted / totalExpected) * 100) : 0;
 
     // ─── Sport: Running ───
     const { data: runs } = await supabase
