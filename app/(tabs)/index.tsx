@@ -133,7 +133,7 @@ export default function HomeScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <HomeHeader habits={habits} completions={completions} />
 
-        <HomeDayProgress completed={completedCount} total={todayHabits.length} />
+        <HomeDayProgress completed={completedCount} total={todayHabits.length} allDone={allDone} />
 
         <HomeHabitList
           items={habitItems}
