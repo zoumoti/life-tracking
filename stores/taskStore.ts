@@ -1,7 +1,5 @@
 import { createPersistedStore } from "./createPersistedStore";
 import { getSupabase } from "../lib/supabase";
-import { syncWidgetData } from "../widgets/shared/widgetSync";
-import { Platform } from "react-native";
 import {
   createGoogleTask,
   updateGoogleTask,
@@ -83,10 +81,6 @@ export const useTaskStore = createPersistedStore<TaskState>(
       const newTask = data as unknown as Task;
       set({ tasks: [newTask, ...get().tasks] });
 
-      if (Platform.OS === "android") {
-        syncWidgetData();
-      }
-
       // Background Google sync
       syncTaskToGoogle(newTask).then((ids) => {
         if (ids.googleTaskId || ids.googleEventId) {
@@ -144,10 +138,6 @@ export const useTaskStore = createPersistedStore<TaskState>(
       // Optimistic
       set({ tasks: get().tasks.filter((t) => t.id !== id) });
 
-      if (Platform.OS === "android") {
-        syncWidgetData();
-      }
-
       const { error } = await getSupabase()
         .from("tasks")
         .delete()
@@ -179,10 +169,6 @@ export const useTaskStore = createPersistedStore<TaskState>(
 
       // Optimistic
       set({ tasks: get().tasks.map((t) => (t.id === id ? updated : t)) });
-
-      if (Platform.OS === "android") {
-        syncWidgetData();
-      }
 
       const { error } = await getSupabase()
         .from("tasks")

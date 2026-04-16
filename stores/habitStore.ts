@@ -1,8 +1,6 @@
 import { createPersistedStore } from "./createPersistedStore";
 import { getSupabase } from "../lib/supabase";
 import { toDateString } from "../lib/dateUtils";
-import { syncWidgetData } from "../widgets/shared/widgetSync";
-import { Platform } from "react-native";
 import type { Tables, InsertTables } from "../types/database";
 
 type Habit = Tables<"habits">;
@@ -150,10 +148,6 @@ export const useHabitStore = createPersistedStore<HabitState>(
         newCompletions[key] = true;
       }
       set({ completions: newCompletions });
-
-      if (Platform.OS === "android") {
-        syncWidgetData();
-      }
 
       // Sync with Supabase — rollback on failure
       try {

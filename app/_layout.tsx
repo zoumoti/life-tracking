@@ -9,7 +9,8 @@ import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import { useAuthStore } from "../stores/authStore";
 import { useColors } from "../lib/theme";
 import { useThemeStore } from "../stores/themeStore";
-import { syncWidgetData } from "../widgets/shared/widgetSync";
+import { useHabitStore } from "../stores/habitStore";
+import { useTaskStore } from "../stores/taskStore";
 
 export default function RootLayout() {
   const { initialize, loading, session } = useAuthStore();
@@ -22,10 +23,31 @@ export default function RootLayout() {
     initialize();
   }, []);
 
+  // Widget sync: subscribe to store changes and sync on Android
   useEffect(() => {
-    if (Platform.OS === "android" && session) {
+    if (Platform.OS !== "android" || !session) return;
+
+    // Lazy import to avoid require cycles (stores → widgetSync → stores)
+    const loadSync = async () => {
+      const { syncWidgetData } = await import("../widgets/shared/widgetSync");
+
+      // Initial sync
       syncWidgetData();
-    }
+
+      // Subscribe to habit/task changes
+      const unsubHabits = useHabitStore.subscribe(() => syncWidgetData());
+      const unsubTasks = useTaskStore.subscribe(() => syncWidgetData());
+
+      return () => {
+        unsubHabits();
+        unsubTasks();
+      };
+    };
+
+    let cleanup: (() => void) | undefined;
+    loadSync().then((fn) => { cleanup = fn; });
+
+    return () => { cleanup?.(); };
   }, [session]);
 
   useEffect(() => {

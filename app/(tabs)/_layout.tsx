@@ -81,21 +81,6 @@ export default function TabLayout() {
           ),
         }}
       />
-      {/* Hide sub-routes from tab bar */}
-      <Tabs.Screen name="sport/index" options={{ href: null }} />
-      <Tabs.Screen name="sport/exercises" options={{ href: null }} />
-      <Tabs.Screen name="sport/programs" options={{ href: null }} />
-      <Tabs.Screen name="sport/program-detail" options={{ href: null }} />
-      <Tabs.Screen name="sport/active-workout" options={{ href: null }} />
-      <Tabs.Screen name="sport/workout-history" options={{ href: null }} />
-      <Tabs.Screen name="sport/workout-detail" options={{ href: null }} />
-      <Tabs.Screen name="sport/running" options={{ href: null }} />
-      <Tabs.Screen name="sport/add-run" options={{ href: null }} />
-      <Tabs.Screen name="sport/_layout" options={{ href: null }} />
-      <Tabs.Screen name="finance/index" options={{ href: null }} />
-      <Tabs.Screen name="finance/_layout" options={{ href: null }} />
-      <Tabs.Screen name="tasks/index" options={{ href: null }} />
-      <Tabs.Screen name="tasks/_layout" options={{ href: null }} />
     </Tabs>
   );
 }
