@@ -19,15 +19,25 @@ async function sendTelegram(text: string) {
 
 function getWeekRange(): { start: string; end: string } {
   const now = new Date();
-  const dayOfWeek = now.getDay();
-  const daysToLastMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-  const lastMonday = new Date(now);
-  lastMonday.setDate(now.getDate() - daysToLastMonday - 7);
-  const lastSunday = new Date(lastMonday);
-  lastSunday.setDate(lastMonday.getDate() + 6);
-
   const fmt = (d: Date) => d.toISOString().split("T")[0];
-  return { start: fmt(lastMonday), end: fmt(lastSunday) };
+
+  // On Monday (cron), recap previous Mon-Sun
+  // Any other day (manual test), recap current week Mon-today
+  const dayOfWeek = now.getDay(); // 0=Sun, 1=Mon...
+  if (dayOfWeek === 1) {
+    // Monday: show last week (Mon-Sun)
+    const lastMonday = new Date(now);
+    lastMonday.setDate(now.getDate() - 7);
+    const lastSunday = new Date(lastMonday);
+    lastSunday.setDate(lastMonday.getDate() + 6);
+    return { start: fmt(lastMonday), end: fmt(lastSunday) };
+  } else {
+    // Other days: show current week so far (Mon-today)
+    const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysToMonday);
+    return { start: fmt(monday), end: fmt(now) };
+  }
 }
 
 /** How many days per week this habit is scheduled */
