@@ -9,10 +9,136 @@ import { useFinanceStore } from "../../stores/financeStore";
 import { useObjectiveStore } from "../../stores/objectiveStore";
 import { isHabitScheduledForDate } from "../../lib/habitUtils";
 import { toDateString } from "../../lib/dateUtils";
-import { writeWidgetData, readWidgetData, type WidgetData } from "./widgetData";
+import { writeWidgetData, type WidgetData } from "./widgetData";
 import { SmallWidget } from "../SmallWidget";
 import { MediumWidget } from "../MediumWidget";
 import { LargeWidget } from "../LargeWidget";
+
+/** Map Feather icon names to emoji for widget display */
+const ICON_TO_EMOJI: Record<string, string> = {
+  moon: "🌙",
+  sun: "☀️",
+  droplet: "💧",
+  "drop-let": "💧",
+  heart: "❤️",
+  book: "📖",
+  "book-open": "📖",
+  coffee: "☕",
+  music: "🎵",
+  star: "⭐",
+  zap: "⚡",
+  target: "🎯",
+  smile: "😊",
+  activity: "🏃",
+  wind: "🧘",
+  feather: "🪶",
+  edit: "✏️",
+  "edit-3": "✏️",
+  check: "✅",
+  "check-circle": "✅",
+  circle: "⭕",
+  award: "🏆",
+  trending_up: "📈",
+  "trending-up": "📈",
+  clock: "⏰",
+  bell: "🔔",
+  eye: "👁️",
+  "eye-off": "🙈",
+  shield: "🛡️",
+  flag: "🚩",
+  home: "🏠",
+  users: "👥",
+  user: "👤",
+  phone: "📱",
+  "phone-call": "📞",
+  mail: "📧",
+  camera: "📷",
+  image: "🖼️",
+  film: "🎬",
+  tv: "📺",
+  headphones: "🎧",
+  mic: "🎙️",
+  pen: "🖊️",
+  "pen-tool": "🖊️",
+  scissors: "✂️",
+  clipboard: "📋",
+  file: "📄",
+  folder: "📁",
+  dollar_sign: "💰",
+  "dollar-sign": "💰",
+  shopping_cart: "🛒",
+  "shopping-cart": "🛒",
+  gift: "🎁",
+  umbrella: "☂️",
+  cloud: "☁️",
+  "cloud-rain": "🌧️",
+  thermometer: "🌡️",
+  map: "🗺️",
+  "map-pin": "📍",
+  navigation: "🧭",
+  compass: "🧭",
+  globe: "🌍",
+  anchor: "⚓",
+  truck: "🚚",
+  bike: "🚴",
+  car: "🚗",
+  plane: "✈️",
+  train: "🚂",
+  briefcase: "💼",
+  tool: "🔧",
+  wrench: "🔧",
+  settings: "⚙️",
+  code: "💻",
+  terminal: "💻",
+  database: "🗄️",
+  wifi: "📶",
+  bluetooth: "📡",
+  battery: "🔋",
+  power: "🔌",
+  "pie-chart": "📊",
+  "bar-chart": "📊",
+  "bar-chart-2": "📊",
+  layers: "📚",
+  grid: "📊",
+  box: "📦",
+  package: "📦",
+  lock: "🔒",
+  unlock: "🔓",
+  key: "🔑",
+  search: "🔍",
+  "help-circle": "❓",
+  info: "ℹ️",
+  "alert-circle": "⚠️",
+  "alert-triangle": "⚠️",
+  x: "❌",
+  "x-circle": "❌",
+  trash: "🗑️",
+  "trash-2": "🗑️",
+  rotate: "🔄",
+  "refresh-cw": "🔄",
+  download: "⬇️",
+  upload: "⬆️",
+  share: "📤",
+  "share-2": "📤",
+  link: "🔗",
+  paperclip: "📎",
+  bookmark: "🔖",
+  tag: "🏷️",
+  hash: "#️⃣",
+  at: "📧",
+  calendar: "📅",
+  watch: "⌚",
+  sunrise: "🌅",
+  sunset: "🌇",
+  "cloud-lightning": "⛈️",
+  snowflake: "❄️",
+  flame: "🔥",
+  droplets: "💦",
+};
+
+function featherToEmoji(iconName: string): string {
+  return ICON_TO_EMOJI[iconName] || "⭕";
+}
 
 function getWeekStart(): string {
   const now = new Date();
@@ -41,7 +167,7 @@ async function buildWidgetData(): Promise<WidgetData> {
   const habits = todayHabits.map((h) => ({
     id: h.id,
     name: h.name,
-    icon: h.icon || "⭐",
+    icon: featherToEmoji(h.icon || "circle"),
     completed: !!habitState.completions[`${h.id}:${today}`],
   }));
 
@@ -99,7 +225,6 @@ export async function syncWidgetData(): Promise<void> {
   const data = await buildWidgetData();
   await writeWidgetData(data);
 
-  // Request widget updates with renderWidget callbacks
   try {
     await requestWidgetUpdate({
       widgetName: "LifeOSSmall",

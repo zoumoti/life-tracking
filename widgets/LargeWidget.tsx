@@ -1,28 +1,39 @@
 import React from "react";
 import { FlexWidget, TextWidget } from "react-native-android-widget";
-import { WidgetColors, WidgetRadius, WidgetFontSize, WidgetSpacing } from "./shared/widgetStyles";
+import { WidgetColors } from "./shared/widgetStyles";
 import type { WidgetData } from "./shared/widgetData";
 
 type Props = { data: WidgetData };
 
-function HabitIcon({ habit }: { habit: { id: string; icon: string; completed: boolean } }) {
+function HabitIcon({ habit }: { habit: { id: string; name: string; icon: string; completed: boolean } }) {
   return (
     <FlexWidget
       style={{
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        backgroundColor: habit.completed ? "rgba(34, 197, 94, 0.12)" : WidgetColors.background,
-        borderWidth: 2,
-        borderColor: habit.completed ? WidgetColors.success : WidgetColors.border,
-        justifyContent: "center",
         alignItems: "center",
-        marginRight: 8,
+        marginRight: 10,
       }}
       clickAction="TOGGLE_HABIT"
       clickActionData={{ habitId: habit.id }}
     >
-      <TextWidget text={habit.completed ? "✅" : habit.icon} style={{ fontSize: 16 }} />
+      <FlexWidget
+        style={{
+          width: 44,
+          height: 44,
+          borderRadius: 12,
+          backgroundColor: habit.completed ? "rgba(34, 197, 94, 0.12)" : WidgetColors.background,
+          borderWidth: 2,
+          borderColor: habit.completed ? WidgetColors.success : WidgetColors.border,
+          justifyContent: "center",
+          alignItems: "center",
+        }}
+      >
+        <TextWidget text={habit.icon} style={{ fontSize: 20 }} />
+      </FlexWidget>
+      <TextWidget
+        text={habit.name.length > 6 ? habit.name.slice(0, 5) + "." : habit.name}
+        style={{ fontSize: 9, color: WidgetColors.textSecondary, marginTop: 3 }}
+        maxLines={1}
+      />
     </FlexWidget>
   );
 }
@@ -125,7 +136,7 @@ export function LargeWidget({ data }: Props) {
       style={{
         flexDirection: "column",
         backgroundColor: WidgetColors.surface,
-        borderRadius: WidgetRadius.card,
+        borderRadius: 14,
         padding: 16,
         height: "match_parent",
         width: "match_parent",
@@ -137,7 +148,7 @@ export function LargeWidget({ data }: Props) {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          marginBottom: 14,
+          marginBottom: 16,
         }}
         clickAction="OPEN_APP"
       >
@@ -171,9 +182,9 @@ export function LargeWidget({ data }: Props) {
       </FlexWidget>
 
       {/* Habits section */}
-      <FlexWidget style={{ marginBottom: 14 }}>
+      <FlexWidget style={{ marginBottom: 16 }}>
         <TextWidget
-          text={`HABITUDES — ${completedCount}/${totalCount}`}
+          text={`HABITUDES  ${completedCount}/${totalCount}`}
           style={{
             fontSize: 10,
             fontWeight: "600",
@@ -190,7 +201,7 @@ export function LargeWidget({ data }: Props) {
 
       {/* Tasks section */}
       <FlexWidget
-        style={{ marginBottom: 14 }}
+        style={{ marginBottom: 16 }}
         clickAction="OPEN_APP"
         clickActionData={{ tab: "tasks" }}
       >
@@ -217,9 +228,7 @@ export function LargeWidget({ data }: Props) {
       </FlexWidget>
 
       {/* Stats row */}
-      <FlexWidget
-        style={{ flexDirection: "row", flexGap: 8, marginBottom: 14 }}
-      >
+      <FlexWidget style={{ flexDirection: "row", flexGap: 8, marginBottom: 16 }}>
         <StatCard value={`${data.stats.weeklyRunKm}km`} label="COURSE" />
         <StatCard value={`${data.stats.weeklyWorkoutCount}`} label="SÉANCES" />
         <StatCard value={balanceStr} label="BALANCE" color={balanceColor} />
@@ -247,7 +256,6 @@ export function LargeWidget({ data }: Props) {
               marginBottom: 6,
             }}
           />
-          {/* Progress bar using flex ratio */}
           <FlexWidget
             style={{
               flexDirection: "row",
