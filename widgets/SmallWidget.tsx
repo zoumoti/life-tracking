@@ -1,6 +1,6 @@
 import React from "react";
 import { FlexWidget, TextWidget } from "react-native-android-widget";
-import { WidgetColors, WidgetRadius, WidgetFontSize, WidgetSpacing } from "./shared/widgetStyles";
+import { WidgetColors } from "./shared/widgetStyles";
 import type { WidgetData } from "./shared/widgetData";
 
 type Props = { data: WidgetData };
@@ -16,7 +16,7 @@ export function SmallWidget({ data }: Props) {
         alignItems: "center",
         justifyContent: "space-between",
         backgroundColor: WidgetColors.surface,
-        borderRadius: WidgetRadius.card,
+        borderRadius: 14,
         paddingHorizontal: 20,
         paddingVertical: 14,
         height: "match_parent",
@@ -49,9 +49,9 @@ export function SmallWidget({ data }: Props) {
         />
       </FlexWidget>
 
-      {/* Stats */}
+      {/* Stats — with proper spacing */}
       <FlexWidget style={{ flexDirection: "row", alignItems: "center" }}>
-        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 12 }}>
+        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 14 }}>
           <TextWidget
             text={`${completedCount}/${totalCount}`}
             style={{ fontSize: 17, fontWeight: "700", color: WidgetColors.goldPrimary }}
@@ -64,7 +64,7 @@ export function SmallWidget({ data }: Props) {
 
         <FlexWidget style={{ width: 1, height: 28, backgroundColor: WidgetColors.border }} />
 
-        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 12 }}>
+        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 14 }}>
           <TextWidget
             text={`${data.stats.todayTaskCount}`}
             style={{ fontSize: 17, fontWeight: "700", color: WidgetColors.textPrimary }}
@@ -77,7 +77,7 @@ export function SmallWidget({ data }: Props) {
 
         <FlexWidget style={{ width: 1, height: 28, backgroundColor: WidgetColors.border }} />
 
-        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 12 }}>
+        <FlexWidget style={{ alignItems: "center", paddingHorizontal: 14 }}>
           <TextWidget
             text={`${data.stats.weeklyRunKm}km`}
             style={{ fontSize: 17, fontWeight: "700", color: WidgetColors.textPrimary }}

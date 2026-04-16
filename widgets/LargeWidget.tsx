@@ -8,10 +8,7 @@ type Props = { data: WidgetData };
 function HabitIcon({ habit }: { habit: { id: string; name: string; icon: string; completed: boolean } }) {
   return (
     <FlexWidget
-      style={{
-        alignItems: "center",
-        marginRight: 12,
-      }}
+      style={{ alignItems: "center", marginRight: 12 }}
       clickAction="TOGGLE_HABIT"
       clickActionData={{ habitId: habit.id }}
     >
@@ -38,7 +35,7 @@ function HabitIcon({ habit }: { habit: { id: string; name: string; icon: string;
   );
 }
 
-function TaskRow({ task }: { task: { title: string; completed: boolean } }) {
+function TaskRow({ task }: { task: { id: string; title: string; completed: boolean } }) {
   return (
     <FlexWidget
       style={{
@@ -50,6 +47,8 @@ function TaskRow({ task }: { task: { title: string; completed: boolean } }) {
         paddingVertical: 6,
         marginBottom: 3,
       }}
+      clickAction="TOGGLE_TASK"
+      clickActionData={{ taskId: task.id }}
     >
       <FlexWidget
         style={{
@@ -111,7 +110,7 @@ export function LargeWidget({ data }: Props) {
         width: "match_parent",
       }}
     >
-      {/* Header */}
+      {/* Header — spacing between title and date */}
       <FlexWidget
         style={{
           flexDirection: "row",
@@ -151,15 +150,10 @@ export function LargeWidget({ data }: Props) {
       </FlexWidget>
 
       {/* Habits section */}
-      <FlexWidget style={{ marginBottom: 14 }}>
+      <FlexWidget style={{ marginBottom: 10 }}>
         <TextWidget
-          text={`HABITUDES  ${completedCount}/${totalCount}`}
-          style={{
-            fontSize: 10,
-            fontWeight: "600",
-            color: WidgetColors.goldPrimary,
-            marginBottom: 6,
-          }}
+          text={`HABITUDES  ${completedCount} / ${totalCount}`}
+          style={{ fontSize: 10, fontWeight: "600", color: WidgetColors.goldPrimary, marginBottom: 6 }}
         />
         <FlexWidget style={{ flexDirection: "row" }}>
           {data.habits.map((habit) => (
@@ -168,42 +162,32 @@ export function LargeWidget({ data }: Props) {
         </FlexWidget>
       </FlexWidget>
 
-      {/* Tasks section */}
-      <FlexWidget
-        style={{ marginBottom: 14 }}
-        clickAction="OPEN_APP"
-        clickActionData={{ tab: "tasks" }}
-      >
+      {/* Tasks section — tappable to toggle */}
+      <FlexWidget style={{ marginBottom: 10 }}>
         <TextWidget
           text="TÂCHES DU JOUR"
-          style={{
-            fontSize: 10,
-            fontWeight: "600",
-            color: WidgetColors.goldDark,
-            marginBottom: 6,
-          }}
+          style={{ fontSize: 10, fontWeight: "600", color: WidgetColors.goldDark, marginBottom: 6 }}
         />
         {displayedTasks.map((task) => (
           <TaskRow key={task.id} task={task} />
         ))}
         {extraTasks > 0 ? (
-          <TextWidget
-            text={`+${extraTasks} de plus`}
-            style={{ fontSize: 10, color: WidgetColors.textMuted, marginTop: 4 }}
-          />
+          <FlexWidget
+            clickAction="OPEN_URI"
+            clickActionData={{ uri: "lifeos:///(tabs)/tasks" }}
+          >
+            <TextWidget
+              text={`+${extraTasks} de plus`}
+              style={{ fontSize: 10, color: WidgetColors.textMuted, marginTop: 4 }}
+            />
+          </FlexWidget>
         ) : (
           <FlexWidget style={{ width: 0, height: 0 }} />
         )}
       </FlexWidget>
 
-      {/* Sport row — full width cards */}
-      <FlexWidget
-        style={{
-          flexDirection: "row",
-          marginBottom: 6,
-          width: "match_parent",
-        }}
-      >
+      {/* Sport row — deep links to sport sections */}
+      <FlexWidget style={{ flexDirection: "row", marginBottom: 6, width: "match_parent" }}>
         <FlexWidget
           style={{
             flex: 1,
@@ -216,6 +200,8 @@ export function LargeWidget({ data }: Props) {
             alignItems: "center",
             justifyContent: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/sport/running" }}
         >
           <TextWidget text="🏃" style={{ fontSize: 16, marginRight: 8 }} />
           <FlexWidget>
@@ -242,6 +228,8 @@ export function LargeWidget({ data }: Props) {
             alignItems: "center",
             justifyContent: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/sport" }}
         >
           <TextWidget text="💪" style={{ fontSize: 16, marginRight: 8 }} />
           <FlexWidget>
@@ -257,14 +245,8 @@ export function LargeWidget({ data }: Props) {
         </FlexWidget>
       </FlexWidget>
 
-      {/* Finance row — balance prominent + revenue/expenses */}
-      <FlexWidget
-        style={{
-          flexDirection: "row",
-          width: "match_parent",
-        }}
-      >
-        {/* Solde total */}
+      {/* Finance row — deep link to finance tab */}
+      <FlexWidget style={{ flexDirection: "row", width: "match_parent" }}>
         <FlexWidget
           style={{
             flex: 1,
@@ -275,6 +257,8 @@ export function LargeWidget({ data }: Props) {
             marginRight: 4,
             alignItems: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/finance" }}
         >
           <TextWidget
             text={totalBalanceStr}
@@ -286,7 +270,6 @@ export function LargeWidget({ data }: Props) {
           />
         </FlexWidget>
 
-        {/* Revenus */}
         <FlexWidget
           style={{
             flex: 1,
@@ -297,6 +280,8 @@ export function LargeWidget({ data }: Props) {
             marginHorizontal: 4,
             alignItems: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/finance" }}
         >
           <TextWidget
             text={revenueStr}
@@ -308,7 +293,6 @@ export function LargeWidget({ data }: Props) {
           />
         </FlexWidget>
 
-        {/* Dépenses */}
         <FlexWidget
           style={{
             flex: 1,
@@ -319,6 +303,8 @@ export function LargeWidget({ data }: Props) {
             marginLeft: 4,
             alignItems: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/finance" }}
         >
           <TextWidget
             text={expensesStr}

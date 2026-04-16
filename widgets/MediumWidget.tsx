@@ -43,7 +43,7 @@ export function MediumWidget({ data }: Props) {
         width: "match_parent",
       }}
     >
-      {/* Header */}
+      {/* Header — OPEN_APP on tap, spacing between title and counter */}
       <FlexWidget
         style={{
           flexDirection: "row",
@@ -75,8 +75,9 @@ export function MediumWidget({ data }: Props) {
             }}
           />
         </FlexWidget>
+        {/* Counter pushed to far right by space-between */}
         <TextWidget
-          text={`${completedCount}/${totalCount}`}
+          text={`${completedCount} / ${totalCount}`}
           style={{ fontSize: 14, fontWeight: "700", color: WidgetColors.goldPrimary }}
         />
       </FlexWidget>
@@ -88,7 +89,7 @@ export function MediumWidget({ data }: Props) {
         ))}
       </FlexWidget>
 
-      {/* Stats row — larger cards */}
+      {/* Stats row — deep links */}
       <FlexWidget style={{ flexDirection: "row", marginTop: 10, width: "match_parent" }}>
         <FlexWidget
           style={{
@@ -99,6 +100,8 @@ export function MediumWidget({ data }: Props) {
             marginRight: 4,
             alignItems: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/sport/running" }}
         >
           <TextWidget
             text={`${data.stats.weeklyRunKm}km`}
@@ -119,6 +122,8 @@ export function MediumWidget({ data }: Props) {
             marginHorizontal: 4,
             alignItems: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/sport" }}
         >
           <TextWidget
             text={`${data.stats.weeklyWorkoutCount}`}
@@ -139,6 +144,8 @@ export function MediumWidget({ data }: Props) {
             marginLeft: 4,
             alignItems: "center",
           }}
+          clickAction="OPEN_URI"
+          clickActionData={{ uri: "lifeos:///(tabs)/tasks" }}
         >
           <TextWidget
             text={`${data.stats.todayTaskCount}`}

@@ -19,68 +19,83 @@ function getToday(): string {
   return `${y}-${m}-${dd}`;
 }
 
-async function toggleHabitInSupabase(
-  habitId: string,
-  completed: boolean
-): Promise<void> {
-  try {
-    const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-      auth: {
-        storage: AsyncStorage,
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: false,
-      },
-    });
-
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
-    if (!user) return;
-
-    const today = getToday();
-
-    if (completed) {
-      await supabase
-        .from("habit_completions")
-        .delete()
-        .eq("habit_id", habitId)
-        .eq("completed_date", today)
-        .eq("user_id", user.id);
-    } else {
-      await supabase
-        .from("habit_completions")
-        .insert({ habit_id: habitId, user_id: user.id, completed_date: today });
-    }
-  } catch {
-    // Background sync failed — app will reconcile on next open
-  }
+function getSupabaseClient() {
+  return createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+    auth: {
+      storage: AsyncStorage,
+      autoRefreshToken: true,
+      persistSession: true,
+      detectSessionInUrl: false,
+    },
+  });
 }
 
-export async function widgetTaskHandler(
-  props: WidgetTaskHandlerProps
-): Promise<void> {
+async function toggleHabitInSupabase(habitId: string, wasCompleted: boolean): Promise<void> {
+  try {
+    const supabase = getSupabaseClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    const today = getToday();
+
+    if (wasCompleted) {
+      await supabase.from("habit_completions").delete()
+        .eq("habit_id", habitId).eq("completed_date", today).eq("user_id", user.id);
+    } else {
+      await supabase.from("habit_completions")
+        .insert({ habit_id: habitId, user_id: user.id, completed_date: today });
+    }
+  } catch {}
+}
+
+async function toggleTaskInSupabase(taskId: string, wasCompleted: boolean): Promise<void> {
+  try {
+    const supabase = getSupabaseClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    if (wasCompleted) {
+      await supabase.from("tasks").update({ completed: false, completed_at: null })
+        .eq("id", taskId).eq("user_id", user.id);
+    } else {
+      await supabase.from("tasks").update({ completed: true, completed_at: new Date().toISOString() })
+        .eq("id", taskId).eq("user_id", user.id);
+    }
+  } catch {}
+}
+
+export async function widgetTaskHandler(props: WidgetTaskHandlerProps): Promise<void> {
   const widgetName = props.widgetInfo.widgetName;
   const data = await readWidgetData();
 
-  // Handle habit toggle
-  if (
-    props.widgetAction === "WIDGET_CLICK" &&
-    props.clickAction === "TOGGLE_HABIT" &&
-    props.clickActionData?.habitId
-  ) {
-    const habitId = props.clickActionData.habitId as string;
-    const habit = data.habits.find((h) => h.id === habitId);
-    if (habit) {
-      const wasCompleted = habit.completed;
-      habit.completed = !wasCompleted;
-      data.lastUpdated = new Date().toISOString();
-      await writeWidgetData(data);
-      toggleHabitInSupabase(habitId, wasCompleted);
+  if (props.widgetAction === "WIDGET_CLICK") {
+    // Habit toggle
+    if (props.clickAction === "TOGGLE_HABIT" && props.clickActionData?.habitId) {
+      const habitId = props.clickActionData.habitId as string;
+      const habit = data.habits.find((h) => h.id === habitId);
+      if (habit) {
+        const wasCompleted = habit.completed;
+        habit.completed = !wasCompleted;
+        data.lastUpdated = new Date().toISOString();
+        await writeWidgetData(data);
+        toggleHabitInSupabase(habitId, wasCompleted);
+      }
+    }
+
+    // Task toggle
+    if (props.clickAction === "TOGGLE_TASK" && props.clickActionData?.taskId) {
+      const taskId = props.clickActionData.taskId as string;
+      const task = data.tasks.find((t) => t.id === taskId);
+      if (task) {
+        const wasCompleted = task.completed;
+        task.completed = !wasCompleted;
+        data.lastUpdated = new Date().toISOString();
+        await writeWidgetData(data);
+        toggleTaskInSupabase(taskId, wasCompleted);
+      }
     }
   }
 
-  // Render the widget via renderWidget callback
+  // Render
   switch (widgetName) {
     case "LifeOSSmall":
       props.renderWidget(<SmallWidget data={data} />);
