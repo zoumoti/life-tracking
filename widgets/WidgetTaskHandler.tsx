@@ -6,6 +6,7 @@ import { MediumWidget } from "./MediumWidget";
 import { LargeWidget } from "./LargeWidget";
 import { createClient } from "@supabase/supabase-js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getValidAccessToken } from "../lib/googleAuth";
 
 const SUPABASE_URL = "https://tzyzaygqvxkazdgeyvha.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -63,6 +64,27 @@ async function toggleTaskInSupabase(taskId: string, wasCompleted: boolean): Prom
   } catch {}
 }
 
+async function toggleTaskInGoogle(googleTaskId: string, newCompleted: boolean): Promise<void> {
+  try {
+    const token = await getValidAccessToken();
+    if (!token) return;
+
+    await fetch(
+      `https://tasks.googleapis.com/tasks/v1/lists/@default/tasks/${googleTaskId}`,
+      {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          status: newCompleted ? "completed" : "needsAction",
+        }),
+      }
+    );
+  } catch {}
+}
+
 export async function widgetTaskHandler(props: WidgetTaskHandlerProps): Promise<void> {
   const widgetName = props.widgetInfo.widgetName;
   const data = await readWidgetData();
@@ -91,6 +113,10 @@ export async function widgetTaskHandler(props: WidgetTaskHandlerProps): Promise<
         data.lastUpdated = new Date().toISOString();
         await writeWidgetData(data);
         toggleTaskInSupabase(taskId, wasCompleted);
+        // Sync with Google Tasks if linked
+        if (task.google_task_id) {
+          toggleTaskInGoogle(task.google_task_id, !wasCompleted);
+        }
       }
     }
   }

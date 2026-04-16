@@ -178,6 +178,7 @@ async function buildWidgetData(): Promise<WidgetData> {
     id: t.id,
     title: t.title,
     completed: t.completed,
+    google_task_id: t.google_task_id || null,
   }));
 
   const weeklyRuns = runningState.runs.filter((r) => r.date >= weekStart);

@@ -13,6 +13,7 @@ export type WidgetTask = {
   id: string;
   title: string;
   completed: boolean;
+  google_task_id: string | null;
 };
 
 export type WidgetStats = {
