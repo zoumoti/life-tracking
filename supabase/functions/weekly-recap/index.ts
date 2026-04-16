@@ -34,14 +34,14 @@ function getWeekRange(): { start: string; end: string } {
 function getExpectedDaysPerWeek(habit: {
   frequency_type: string;
   frequency_days: number[] | null;
-  x_per_week: number | null;
+  frequency_value: number | null;
 }): number {
   if (habit.frequency_type === "daily") return 7;
   if (habit.frequency_type === "specific_days" && habit.frequency_days) {
     return habit.frequency_days.length;
   }
-  if (habit.frequency_type === "x_per_week" && habit.x_per_week) {
-    return habit.x_per_week;
+  if (habit.frequency_type === "x_per_week" && habit.frequency_value) {
+    return habit.frequency_value;
   }
   return 7;
 }
@@ -61,7 +61,7 @@ Deno.serve(async () => {
     // ─── Habits ───
     const { data: habits } = await supabase
       .from("habits")
-      .select("id, name, frequency_type, frequency_days, x_per_week")
+      .select("id, name, frequency_type, frequency_days, frequency_value")
       .eq("user_id", userId)
       .is("archived_at", null);
 
