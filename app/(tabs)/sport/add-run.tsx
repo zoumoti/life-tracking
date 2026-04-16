@@ -1,11 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { View, Text, TextInput, Pressable, ScrollView } from "react-native";
 import { Feather } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import { SafeScreen } from "../../../components/SafeScreen";
 import { Button } from "../../../components/ui/Button";
 import { useRunningStore } from "../../../stores/runningStore";
 import { formatPace } from "../../../lib/formatters";
+import { toDateString, parseDate } from "../../../lib/dateUtils";
 import { RUNNING_TYPES, RUNNING_TYPE_LABELS } from "../../../lib/constants";
 import { useColors } from "../../../lib/theme";
 import type { RunningType } from "../../../lib/constants";
@@ -13,13 +15,31 @@ import type { RunningType } from "../../../lib/constants";
 export default function AddRunScreen() {
   const c = useColors();
   const router = useRouter();
-  const { addRun } = useRunningStore();
+  const { editId } = useLocalSearchParams<{ editId?: string }>();
+  const { runs, addRun, updateRun } = useRunningStore();
+
+  const editingRun = editId ? runs.find((r) => r.id === editId) : null;
+  const isEditing = !!editingRun;
+
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
   const [type, setType] = useState<RunningType>("easy");
   const [effort, setEffort] = useState(3);
+  const [date, setDate] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (editingRun) {
+      setDistance(String(editingRun.distance_km));
+      setDuration(String(editingRun.duration_minutes));
+      setType(editingRun.type as RunningType);
+      setEffort(editingRun.perceived_effort);
+      setNotes(editingRun.notes ?? "");
+      setDate(parseDate(editingRun.date));
+    }
+  }, [editingRun?.id]);
 
   const distanceNum = parseFloat(distance) || 0;
   const durationNum = parseFloat(duration) || 0;
@@ -28,19 +48,27 @@ export default function AddRunScreen() {
     if (distanceNum <= 0 || durationNum <= 0) return;
     setLoading(true);
 
-    const today = new Date().toISOString().split("T")[0];
-    const { error } = await addRun({
-      date: today,
-      distance_km: distanceNum,
-      duration_minutes: durationNum,
-      type,
-      perceived_effort: effort,
-      notes: notes.trim() || null,
-    });
-
-    setLoading(false);
-    if (!error) {
-      router.back();
+    if (isEditing && editId) {
+      const { error } = await updateRun(editId, {
+        distance_km: distanceNum,
+        duration_minutes: durationNum,
+        type,
+        perceived_effort: effort,
+        notes: notes.trim() || null,
+      });
+      setLoading(false);
+      if (!error) router.back();
+    } else {
+      const { error } = await addRun({
+        date: toDateString(date),
+        distance_km: distanceNum,
+        duration_minutes: durationNum,
+        type,
+        perceived_effort: effort,
+        notes: notes.trim() || null,
+      });
+      setLoading(false);
+      if (!error) router.back();
     }
   };
 
@@ -50,10 +78,35 @@ export default function AddRunScreen() {
         <Pressable onPress={() => router.back()} className="p-2">
           <Feather name="arrow-left" size={24} color={c.text} />
         </Pressable>
-        <Text style={{ color: c.text }} className="text-xl font-bold ml-2">Nouvelle course</Text>
+        <Text style={{ color: c.text }} className="text-xl font-bold ml-2">
+          {isEditing ? "Modifier la course" : "Nouvelle course"}
+        </Text>
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
+        <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Date</Text>
+        <Pressable
+          onPress={() => setShowDatePicker(true)}
+          style={{ backgroundColor: c.surface }}
+          className="rounded-button px-4 py-3 mb-4 flex-row items-center justify-between"
+        >
+          <Text style={{ color: c.text }} className="text-base">
+            {date.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+          </Text>
+          <Feather name="calendar" size={18} color={c.textMuted} />
+        </Pressable>
+        {showDatePicker && (
+          <DateTimePicker
+            value={date}
+            mode="date"
+            maximumDate={new Date()}
+            onChange={(_, selectedDate) => {
+              setShowDatePicker(false);
+              if (selectedDate) setDate(selectedDate);
+            }}
+          />
+        )}
+
         <Text style={{ color: c.textSecondary }} className="text-sm mb-2">Distance (km)</Text>
         <TextInput
           style={{ backgroundColor: c.surface, color: c.text }}
