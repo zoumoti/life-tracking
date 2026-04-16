@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "619655485622",
+    "project_id": "life-os-5cc34",
+    "storage_bucket": "life-os-5cc34.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:619655485622:android:eec2a3dbc15773ec3b6e17",
+        "android_client_info": {
+          "package_name": "com.zoumoti.lifeos"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "619655485622-dmoh3e2dkprm1q2qn6dkdvvp1mk8fcl2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zoumoti.lifeos",
+            "certificate_hash": "59334a8670c73790bba7d428b7197bc5df44aa42"
+          }
+        },
+        {
+          "client_id": "619655485622-r2jdvhe8cgsc9v665gpfqp7ca2dih3at.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAT7QaR_F1Kds4vp0akEHkHGrj_mWn9hcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "619655485622-r2jdvhe8cgsc9v665gpfqp7ca2dih3at.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

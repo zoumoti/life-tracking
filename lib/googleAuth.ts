@@ -8,7 +8,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const STORAGE_KEY_CONNECTED = "google_connected";
 
 GoogleSignin.configure({
-  webClientId: "1063289815690-6eggvslg2kn9buvbqa3fc95io2qmn0gp.apps.googleusercontent.com",
+  webClientId: "619655485622-r2jdvhe8cgsc9v665gpfqp7ca2dih3at.apps.googleusercontent.com",
   scopes: [
     "https://www.googleapis.com/auth/tasks",
     "https://www.googleapis.com/auth/calendar.events",
