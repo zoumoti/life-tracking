@@ -7,6 +7,8 @@ export interface Task {
   title: string;
   notes: string | null;
   due_date: string | null; // yyyy-MM-dd
+  start_time: string | null; // HH:mm
+  end_time: string | null; // HH:mm
   priority: TaskPriority;
   completed: boolean;
   completed_at: string | null;
@@ -19,5 +21,7 @@ export type TaskInput = {
   title: string;
   notes?: string | null;
   due_date?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
   priority?: TaskPriority;
 };

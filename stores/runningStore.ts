@@ -17,6 +17,7 @@ type RunningState = {
   fetchRuns: () => Promise<void>;
   addRun: (data: Omit<InsertTables<"running_logs">, "user_id">) => Promise<{ error: string | null }>;
   deleteRun: (id: string) => Promise<{ error: string | null }>;
+  updateRun: (id: string, data: Partial<Omit<InsertTables<"running_logs">, "user_id">>) => Promise<{ error: string | null }>;
   getStats: () => RunStats;
   getWeeklyDistances: () => { label: string; value: number }[];
 };
@@ -79,6 +80,32 @@ export const useRunningStore = create<RunningState>((set, get) => ({
     const { error } = await supabase.from("running_logs").delete().eq("id", id);
     if (!error) {
       set({ runs: get().runs.filter((r) => r.id !== id) });
+    }
+    return { error: error?.message ?? null };
+  },
+
+  updateRun: async (id, data) => {
+    const run = get().runs.find((r) => r.id === id);
+    if (!run) return { error: "Course introuvable" };
+
+    const distance = data.distance_km ?? run.distance_km;
+    const duration = data.duration_minutes ?? run.duration_minutes;
+    const pacePerKm = distance > 0 ? duration / distance : null;
+
+    const { error } = await supabase
+      .from("running_logs")
+      .update({ ...data, pace_per_km: pacePerKm })
+      .eq("id", id);
+
+    if (!error) {
+      const linkedId = data.linked_objective_id ?? run.linked_objective_id;
+      if (linkedId && pacePerKm) {
+        await supabase
+          .from("objectives")
+          .update({ current_value: pacePerKm })
+          .eq("id", linkedId);
+      }
+      await get().fetchRuns();
     }
     return { error: error?.message ?? null };
   },

@@ -71,27 +71,30 @@ export default function RunningScreen() {
           </View>
         }
         renderItem={({ item }) => (
-          <Card className="mb-2">
-            <View className="flex-row items-center justify-between">
-              <View>
-                <Text style={{ color: c.text }} className="font-bold text-sm">
-                  {formatDateShort(item.date)} — {item.distance_km} km
-                </Text>
-                <Text style={{ color: c.textSecondary }} className="text-xs mt-1">
-                  {RUNNING_TYPE_LABELS[item.type as RunningType]} · {formatPace(item.duration_minutes, item.distance_km)} /km
-                </Text>
+          <Pressable onPress={() => router.push({ pathname: "/(tabs)/sport/run-detail", params: { id: item.id } } as any)}>
+            <Card className="mb-2">
+              <View className="flex-row items-center justify-between">
+                <View>
+                  <Text style={{ color: c.text }} className="font-bold text-sm">
+                    {formatDateShort(item.date)} — {item.distance_km} km
+                  </Text>
+                  <Text style={{ color: c.textSecondary }} className="text-xs mt-1">
+                    {RUNNING_TYPE_LABELS[item.type as RunningType]} · {formatPace(item.duration_minutes, item.distance_km)} /km
+                  </Text>
+                </View>
+                <View className="flex-row items-center">
+                  {Array.from({ length: 5 }).map((_, i) => (
+                    <View
+                      key={i}
+                      style={{ backgroundColor: i < item.perceived_effort ? c.primary : c.surfaceLight }}
+                      className="w-2 h-2 rounded-full mx-0.5"
+                    />
+                  ))}
+                  <Feather name="chevron-right" size={16} color={c.textMuted} style={{ marginLeft: 8 }} />
+                </View>
               </View>
-              <View className="flex-row items-center">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <View
-                    key={i}
-                    style={{ backgroundColor: i < item.perceived_effort ? c.primary : c.surfaceLight }}
-                    className="w-2 h-2 rounded-full mx-0.5"
-                  />
-                ))}
-              </View>
-            </View>
-          </Card>
+            </Card>
+          </Pressable>
         )}
         ListEmptyComponent={
           !loading ? (

@@ -11,6 +11,11 @@ import { RestTimer } from "../../../components/sport/RestTimer";
 import { ExercisePickerSheet } from "../../../components/sport/ExercisePickerSheet";
 import { WorkoutSummary } from "../../../components/sport/WorkoutSummary";
 import { useWorkoutStore } from "../../../stores/workoutStore";
+import {
+  startWorkoutNotification,
+  stopWorkoutNotification,
+  updateRestTimer,
+} from "../../../lib/workoutNotification";
 import { useExerciseStore } from "../../../stores/exerciseStore";
 import { formatDuration } from "../../../lib/formatters";
 import { useColors } from "../../../lib/theme";
@@ -61,6 +66,20 @@ export default function ActiveWorkoutScreen() {
     }
   }, [currentSession?.id]);
 
+  // Manage workout notification
+  useEffect(() => {
+    if (currentSession?.startedAt) {
+      startWorkoutNotification(currentSession.startedAt);
+    } else {
+      stopWorkoutNotification();
+    }
+  }, [currentSession?.startedAt]);
+
+  // Update rest timer in notification
+  useEffect(() => {
+    updateRestTimer(currentSession?.restTimerStart ?? null);
+  }, [currentSession?.restTimerStart]);
+
   const exercisePicker = ExercisePickerSheet({
     onSelect: (exercise) => {
       addExerciseToSession(exercise.id, exercise.name);
@@ -79,6 +98,7 @@ export default function ActiveWorkoutScreen() {
 
   const handleFinish = async () => {
     setConfirmEnd(false);
+    await stopWorkoutNotification();
     const result = await finishSession();
     setSummary(result);
   };

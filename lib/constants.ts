@@ -1,4 +1,4 @@
-export const APP_NAME = "Life Tracker";
+export const APP_NAME = "Life OS";
 
 export const TABS = {
   home: { label: "Aujourd'hui", icon: "home" },

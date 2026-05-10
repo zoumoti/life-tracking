@@ -14,11 +14,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "619655485622-dmoh3e2dkprm1q2qn6dkdvvp1mk8fcl2.apps.googleusercontent.com",
+          "client_id": "619655485622-7dbv3a8d5mdcqdoruq1p96sr7o1n25n7.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.zoumoti.lifeos",
-            "certificate_hash": "59334a8670c73790bba7d428b7197bc5df44aa42"
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
           }
         },
         {

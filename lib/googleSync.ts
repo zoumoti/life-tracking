@@ -124,11 +124,22 @@ export async function createCalendarEvent(
   if (!headers) return null;
 
   try {
+    let start: Record<string, string>;
+    let end: Record<string, string>;
+
+    if (task.start_time && task.end_time) {
+      start = { dateTime: `${task.due_date}T${task.start_time}:00`, timeZone: "Europe/Paris" };
+      end = { dateTime: `${task.due_date}T${task.end_time}:00`, timeZone: "Europe/Paris" };
+    } else {
+      start = { date: task.due_date };
+      end = { date: task.due_date };
+    }
+
     const body = {
       summary: task.title,
       description: task.notes ?? "",
-      start: { date: task.due_date },
-      end: { date: task.due_date },
+      start,
+      end,
     };
 
     const resp = await fetch(
@@ -155,8 +166,13 @@ export async function updateCalendarEvent(
     if (task.title !== undefined) body.summary = task.title;
     if (task.notes !== undefined) body.description = task.notes;
     if (task.due_date !== undefined) {
-      body.start = { date: task.due_date };
-      body.end = { date: task.due_date };
+      if (task.start_time && task.end_time) {
+        body.start = { dateTime: `${task.due_date}T${task.start_time}:00`, timeZone: "Europe/Paris" };
+        body.end = { dateTime: `${task.due_date}T${task.end_time}:00`, timeZone: "Europe/Paris" };
+      } else {
+        body.start = { date: task.due_date };
+        body.end = { date: task.due_date };
+      }
     }
 
     const resp = await fetch(
